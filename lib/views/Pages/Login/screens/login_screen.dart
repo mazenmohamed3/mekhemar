@@ -101,13 +101,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Don't have an account? \t", // Regular text
+                        text: "dontHaveAccountLabel".tr(), // Regular text
                         style: AppTheme.textTheme.bodyLarge!.copyWith(
                           color: AppTheme.defaultTextColor(context),
                         ), // Default color (you can adjust if needed)
                       ),
                       TextSpan(
-                        text: "Create one Now!", // Highlighted text
+                        text: "createAccountButtonLabel".tr(), // Highlighted text
                         style: AppTheme.textTheme.labelLarge!.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                         ),

@@ -9,6 +9,8 @@
   "loginButtonLabel": "تسجيل الدخول",
   "registerButtonLabel": "إنشئ حساب",
   "googleButtonLabel": "تسجيل الدخول باستخدام جوجل",
+  "dontHaveAccountLabel": "لا تملك حساب؟ \t",
+  "createAccountButtonLabel": "أنشئ حساب",
 
   "splashScreenText": "أول روبوت دردشة مصري",
   "splashScreenFooter": "تحت اشراف الدكتورة لمياء",

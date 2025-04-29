@@ -9,6 +9,8 @@
   "loginButtonLabel": "Login",
   "registerButtonLabel": "Create Account",
   "googleButtonLabel": "Sign in with Google",
+  "dontHaveAccountLabel": "Don't have an account? \t",
+  "createAccountButtonLabel": "Create Account",
 
   "splashScreenText": "The First Egyptian Chatbot",
   "splashScreenFooter": "Presented to Dr Lamiaa",
