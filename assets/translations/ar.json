@@ -1,0 +1,49 @@
+{
+  "appName": "مخيمر",
+  "emailLabel": "بريد إلكتروني",
+  "emailHint": "أدخل بريدك الإلكتروني",
+  "passwordLabel": "كلمة المرور",
+  "passwordHint": "أدخل كلمة المرور الخاصة بك",
+  "rememberMeLabel": "تذكرنى",
+  "forgotPasswordButtonLabel": "نسيت كلمة السر؟",
+  "loginButtonLabel": "تسجيل الدخول",
+  "registerButtonLabel": "إنشئ حساب",
+  "googleButtonLabel": "تسجيل الدخول باستخدام جوجل",
+
+  "splashScreenText": "أول روبوت دردشة مصري",
+  "splashScreenFooter": "تحت اشراف الدكتورة لمياء",
+
+  "cursor": "_",
+  "englishButtonLabel": "English",
+  "arabicButtonLabel": "العربية",
+  "welcomeText": "اهلا في مخيمر",
+  "languagePrompt": "الرجاء اختيار لغتك",
+
+  "forgotPasswordAppbarTitle": "اعاده ضبط كلمه السر",
+  "forgotPasswordText": "أدخل بريدك الإلكتروني لإعادة ضبط كلمة المرور",
+  "forgetPasswordLabel": "بريد إلكتروني",
+  "forgetPasswordHint": "أدخل بريدك الإلكتروني",
+  "forgetPasswordButtonLabel": "أرسل رابط إعادة الضبط",
+  "forgetPasswordSuccess": "تم إرسال رابط إعادة التعيين",
+
+  "signupAppbarTitle": "إنشاء حساب",
+  "signupText": "مرحبًا! دعنا نُنشئ حسابك الجديد.",
+  "signUpUsernameLabel": "اسم المستخدم",
+  "signUpUsernameHint": "أدخل اسم المستخدم",
+  "signUpEmailLabel": "البريد الإلكتروني",
+  "signUpEmailHint": "أدخل بريدك الإلكتروني",
+  "signUpPasswordLabel": "كلمة المرور",
+  "signUpPasswordHint": "أدخل كلمة المرور",
+  "signUpConfirmPasswordLabel": "تأكيد كلمة المرور",
+  "signUpConfirmPasswordHint": "أعد إدخال كلمة المرور",
+  "signUpButtonLabel": "إنشاء حساب",
+
+  "staySignedInDialogTitle": "هل تريد البقاء مسجلاً في هذا الجهاز؟",
+  "staySignedInDialogSubtitle": "هل ترغب في البقاء مسجلاً في هذا الجهاز؟",
+  "staySignedInNoButtonLabel": "لا",
+  "staySignedInYesButtonLabel": "نعم",
+
+  "resetPasswordSuccessDialogTitle": "تم إعادة تعيين كلمة المرور بنجاح",
+  "resetPasswordSuccessDialogSubtitle": "تم إعادة تعيين كلمة المرور بنجاح. سيتم الآن إعادة توجيهك إلى شاشة تسجيل الدخول.",
+  "resetPasswordOkayButtonLabel": "حسنًا"
+}

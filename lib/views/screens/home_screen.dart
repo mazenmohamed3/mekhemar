@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../controllers/Auth/auth_controller.dart';
-import '../../controllers/home_controller.dart';
+import '../../controllers/Pages/Auth/sources/auth_datasource.dart';
+import '../../controllers/Pages/Home/home_controller.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  final AuthController authController;
+  final AuthDatasource authController;
   final HomeController homeController;
 
   const HomeScreen({
