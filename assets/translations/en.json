@@ -1,0 +1,49 @@
+{
+  "appName": "Mekhemar",
+  "emailLabel": "Email",
+  "emailHint": "Enter your Email",
+  "passwordLabel": "Password",
+  "passwordHint": "Enter your Password",
+  "rememberMeLabel": "Remember Me",
+  "forgotPasswordButtonLabel": "Forgot Password?",
+  "loginButtonLabel": "Login",
+  "registerButtonLabel": "Create Account",
+  "googleButtonLabel": "Sign in with Google",
+
+  "splashScreenText": "The First Egyptian Chatbot",
+  "splashScreenFooter": "Presented to Dr Lamiaa",
+
+  "cursor": "_",
+  "englishButtonLabel": "English",
+  "arabicButtonLabel": "العربية",
+  "welcomeText": "Welcome to Mekhemar",
+  "languagePrompt": "Please choose your language",
+
+  "forgotPasswordAppbarTitle": "Forgot Password",
+  "forgotPasswordText": "Enter your email to reset password",
+  "forgetPasswordLabel": "Email",
+  "forgetPasswordHint": "Enter your Email",
+  "forgetPasswordButtonLabel": "Send Reset Link",
+  "forgetPasswordSuccess": "Reset link sent",
+
+  "signupAppbarTitle": "Sign Up",
+  "signupText": "Welcome! Let’s set up your new account.",
+  "signUpUsernameLabel": "Username",
+  "signUpUsernameHint": "Enter your Username",
+  "signUpEmailLabel": "Email",
+  "signUpEmailHint": "Enter your Email",
+  "signUpPasswordLabel": "Password",
+  "signUpPasswordHint": "Enter your Password",
+  "signUpConfirmPasswordLabel": "Confirm Password",
+  "signUpConfirmPasswordHint": "Confirm your Password",
+  "signUpButtonLabel": "Sign Up",
+
+  "staySignedInDialogTitle": "Stay Signed In?",
+  "staySignedInDialogSubtitle": "Would you like to stay signed in on this device?",
+  "staySignedInNoButtonLabel": "No",
+  "staySignedInYesButtonLabel": "Yes",
+
+  "resetPasswordSuccessDialogTitle": "Password Reset Successful",
+  "resetPasswordSuccessDialogSubtitle": "Your password has been successfully reset. You will now be redirected to the login screen.",
+  "resetPasswordOkayButtonLabel": "Okay"
+}
