@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../controllers/Auth/auth_controller.dart';
+
+import '../../controllers/Pages/Auth/sources/auth_datasource.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final AuthController authController;
+  final AuthDatasource authController;
 
   const ProfileScreen({super.key, required this.authController});
 
