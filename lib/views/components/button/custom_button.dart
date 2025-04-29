@@ -21,9 +21,12 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color ?? Theme.of(context).colorScheme.primary,
-        ),
+        style:
+            color != null
+                ? Theme.of(context).elevatedButtonTheme.style!.copyWith(
+                  backgroundColor: WidgetStatePropertyAll(color),
+                )
+                : null,
         icon:
             (showIcon ?? false) && icon != null
                 ? icon!
