@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "865609841747",
+    "project_id": "mekhemar-19f76",
+    "storage_bucket": "mekhemar-19f76.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:865609841747:android:b160fe1988155c5bfb1aa6",
+        "android_client_info": {
+          "package_name": "com.benhauniversity.mekhemar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "865609841747-8s8bj56n84vs37j1desfhb47obht7viv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.benhauniversity.mekhemar",
+            "certificate_hash": "c83c326ab5e62a3c54b1475554f6dfb6264b7076"
+          }
+        },
+        {
+          "client_id": "865609841747-pum7tm9jndsofbin5nb5sdv3ed5ul0ja.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.benhauniversity.mekhemar",
+            "certificate_hash": "7dbaf6f58d1475078f03d44941e69d5a17e18929"
+          }
+        },
+        {
+          "client_id": "865609841747-alb0b5mqd3tkc9so4pfcvio444v1ofm3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDYAnNl_hUWDyx7MwjW1HWSY1hrnbwMb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "865609841747-alb0b5mqd3tkc9so4pfcvio444v1ofm3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "865609841747-dmj9pcgf4jej4fegg2pg4j9ghmjte5kk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.benhauniversity.mekhemar"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
