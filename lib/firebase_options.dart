@@ -41,13 +41,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCIs3Ica5OIms0U5FKVwZvx_TXjV9Ok5YA',
-    appId: '1:865609841747:web:29beae5a0fab0e28fb1aa6',
-    messagingSenderId: '865609841747',
-    projectId: 'mekhemar-19f76',
-    authDomain: 'mekhemar-19f76.firebaseapp.com',
-    storageBucket: 'mekhemar-19f76.firebasestorage.app',
-    measurementId: 'G-VXP4F31BKP',
+    apiKey: "AIzaSyCIs3Ica5OIms0U5FKVwZvx_TXjV9Ok5YA",
+    authDomain: "mekhemar-19f76.firebaseapp.com",
+    projectId: "mekhemar-19f76",
+    storageBucket: "mekhemar-19f76.firebasestorage.app",
+    messagingSenderId: "865609841747",
+    appId: "1:865609841747:web:23cddc1730f93ddbfb1aa6",
+    measurementId: "G-KFQNMS2H4E",
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '865609841747',
     projectId: 'mekhemar-19f76',
     storageBucket: 'mekhemar-19f76.firebasestorage.app',
-    androidClientId: '865609841747-oika0ua91md90m2quo67jvjpu1louq4u.apps.googleusercontent.com',
+    androidClientId: '865609841747-8s8bj56n84vs37j1desfhb47obht7viv.apps.googleusercontent.com',
     iosClientId: '865609841747-dmj9pcgf4jej4fegg2pg4j9ghmjte5kk.apps.googleusercontent.com',
     iosBundleId: 'com.benhauniversity.mekhemar',
   );
@@ -75,7 +75,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '865609841747',
     projectId: 'mekhemar-19f76',
     storageBucket: 'mekhemar-19f76.firebasestorage.app',
-    androidClientId: '865609841747-oika0ua91md90m2quo67jvjpu1louq4u.apps.googleusercontent.com',
+    androidClientId: '865609841747-8s8bj56n84vs37j1desfhb47obht7viv.apps.googleusercontent.com',
     iosClientId: '865609841747-dmj9pcgf4jej4fegg2pg4j9ghmjte5kk.apps.googleusercontent.com',
     iosBundleId: 'com.benhauniversity.mekhemar',
   );

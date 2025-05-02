@@ -1,84 +1,163 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../Router/app_page.dart';
+import '../../services/auth_service.dart';
 import '../../sources/auth_datasource.dart';
 
 class LoginController {
-  LoginController(this.authDataSource);
+  LoginController(this.authDataSource, this.loginService);
 
   final AuthDatasource authDataSource;
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Declare the formKey here for the login form.
+  final AuthService loginService;
+
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final FocusNode emailFocus = FocusNode();
   final FocusNode passwordFocus = FocusNode();
+  final FocusNode loginButtonFocus = FocusNode();
+
+  late void Function(void Function()) setEmailButtonState;
+  late void Function(void Function()) setGoogleButtonState;
+  late void Function(void Function()) setRememberMeState;
+
   bool rememberMe = false;
+  bool isEmailNoAction = true;
+  bool isGoogleNoAction = false;
+  bool isEmailLoading = false;
+  bool isGoogleLoading = false;
 
-  void toggleRememberMe(bool value) {
-    rememberMe = value;
+  void toggleRememberMe({bool? value}) {
+    if (value == null) {
+      rememberMe = false;
+    } else {
+      setRememberMeState(() {
+        rememberMe = value;
+      });
+    }
   }
 
-  String? emailValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter an email address';
+  void toggleNoAction({bool? value, bool? isGoogle}) {
+    if (value == null) {
+      isGoogleNoAction = false;
+      isEmailNoAction = true;
+    } else if (isGoogle == true) {
+      setGoogleButtonState(() {
+        isGoogleNoAction = value;
+      });
+    } else {
+      setEmailButtonState(() {
+        isEmailNoAction = value;
+      });
     }
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
-    }
-    return null;
   }
 
-  String? passwordValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a password';
+  void onFieldSubmitted(String value) {
+    final isEmailValid =
+        loginService.validateEmail(emailController.text) == null;
+    final isPasswordValid =
+        loginService.validatePassword(passwordController.text) == null;
+
+    if (emailFocus.hasFocus && (!isEmailValid || !isPasswordValid)) {
+      emailFocus.unfocus();
+      Future.microtask(() {
+        if (!isEmailValid) {
+          emailFocus.requestFocus();
+        } else {
+          passwordFocus.requestFocus();
+        }
+        toggleNoAction(value: true);
+      });
+    } else if (passwordFocus.hasFocus && (!isEmailValid || !isPasswordValid)) {
+      passwordFocus.unfocus();
+      Future.microtask(() {
+        if (!isPasswordValid) {
+          passwordFocus.requestFocus();
+        } else {
+          emailFocus.requestFocus();
+        }
+        toggleNoAction(value: true);
+      });
+    } else {
+      toggleNoAction(value: false);
+      loginButtonFocus
+        ..canRequestFocus = true
+        ..requestFocus();
     }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-    return null;
   }
+
+  void onTapOutside() {
+    if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
+      if (formKey.currentState!.validate()) {
+        toggleNoAction(value: false);
+      }
+    } else {
+      toggleNoAction(value: true);
+    }
+  }
+
+  void toggleIsLoading({bool? value, bool? isGoogle}) {
+    if (value == null) {
+      isGoogleLoading = false;
+      isEmailLoading = false;
+    } else if (isGoogle == true) {
+      setGoogleButtonState(() {
+        isGoogleLoading = value;
+      });
+      toggleNoAction(value: value, isGoogle: isGoogle);
+    } else if (isGoogle == false) {
+      setEmailButtonState(() {
+        isEmailLoading = value;
+      });
+      toggleNoAction(value: value, isGoogle: isGoogle);
+    }
+  }
+
+  String? emailValidator(String? value) => loginService.validateEmail(value);
+
+  String? passwordValidator(String? value) =>
+      loginService.validatePassword(value);
 
   Future<void> loginWithEmailAndPassword({
     required BuildContext context,
   }) async {
     if (formKey.currentState!.validate()) {
       try {
+        toggleIsLoading(value: true, isGoogle: false);
         await authDataSource.emailAndPasswordLogin(
           rememberMe: rememberMe,
           email: emailController.text,
           password: passwordController.text,
+          context: context,
         );
-
         if (!context.mounted) return;
         dispose();
         context.go(AppPage.home);
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      } finally {
+        toggleIsLoading(value: false, isGoogle: false);
       }
+    } else {
+      toggleNoAction(value: true, isGoogle: false);
     }
   }
 
   Future<void> loginWithGoogle({required BuildContext context}) async {
     try {
+      toggleIsLoading(value: true, isGoogle: true);
       await authDataSource.signInWithGoogle(context: context);
       if (!context.mounted) return;
       dispose();
       context.go(AppPage.home);
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      toggleIsLoading(value: false, isGoogle: true);
     }
   }
 
   void dispose() {
-    rememberMe = false;
-    emailController.text = '';
-    passwordController.text = '';
+    toggleRememberMe();
+    toggleNoAction();
+    toggleIsLoading();
+    emailController.clear();
+    passwordController.clear();
   }
 }
