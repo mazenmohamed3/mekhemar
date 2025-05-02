@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../controllers/Pages/Auth/Sign Up/controllers/signup_controller.dart';
 import '../../../components/Text/custom_text.dart';
 import '../../../components/Text/custom_text_form_field.dart';
@@ -21,6 +22,13 @@ class SignupScreen extends StatelessWidget {
           fontSize: 20.sp,
           textAlign: TextAlign.center,
         ),
+        leading: IconButton(
+          onPressed: () {
+            signupController.dispose();
+            context.pop();
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -29,7 +37,8 @@ class SignupScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(  // <-- this makes form area scrollable independently
+              Expanded(
+                // <-- this makes form area scrollable independently
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,38 +60,59 @@ class SignupScreen extends StatelessWidget {
                               focus: signupController.usernameFocus,
                               controller: signupController.usernameController,
                               keyboardType: TextInputType.name,
+                              onFieldSubmitted:
+                                  signupController.onFieldSubmitted,
+                              onTapOutside: signupController.onTapOutside,
                               label: "signUpUsernameLabel",
                               hintText: "signUpUsernameHint",
-                              validator: (value) => signupController.usernameValidator(value),
+                              validator:
+                                  (value) =>
+                                      signupController.usernameValidator(value),
                             ),
                             SizedBox(height: 16.h),
                             CustomTextFormField(
                               focus: signupController.emailFocus,
                               controller: signupController.emailController,
                               keyboardType: TextInputType.emailAddress,
+                              onFieldSubmitted:
+                                  signupController.onFieldSubmitted,
+                              onTapOutside: signupController.onTapOutside,
                               label: "signUpEmailLabel",
                               hintText: "signUpEmailHint",
-                              validator: (value) => signupController.emailValidator(value),
+                              validator:
+                                  (value) =>
+                                      signupController.emailValidator(value),
                             ),
                             SizedBox(height: 16.h),
                             CustomTextFormField(
                               focus: signupController.passwordFocus,
                               controller: signupController.passwordController,
                               keyboardType: TextInputType.visiblePassword,
+                              onFieldSubmitted:
+                                  signupController.onFieldSubmitted,
+                              onTapOutside: signupController.onTapOutside,
                               label: "signUpPasswordLabel",
                               hintText: "signUpPasswordHint",
                               obscureText: true,
-                              validator: (value) => signupController.passwordValidator(value),
+                              validator:
+                                  (value) =>
+                                      signupController.passwordValidator(value),
                             ),
                             SizedBox(height: 16.h),
                             CustomTextFormField(
                               focus: signupController.confirmPasswordFocus,
-                              controller: signupController.confirmPasswordController,
+                              controller:
+                                  signupController.confirmPasswordController,
                               keyboardType: TextInputType.visiblePassword,
+                              onFieldSubmitted:
+                                  signupController.onFieldSubmitted,
+                              onTapOutside: signupController.onTapOutside,
                               label: "signUpConfirmPasswordLabel",
                               hintText: "signUpConfirmPasswordHint",
                               obscureText: true,
-                              validator: (value) => signupController.confirmPasswordValidator(value),
+                              validator:
+                                  (value) => signupController
+                                      .confirmPasswordValidator(value),
                             ),
                           ],
                         ),
@@ -93,11 +123,19 @@ class SignupScreen extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0.h),
-                child: CustomButton(
-                    text: 'signUpButtonLabel',
-                    onPressed: () async {
-                      await signupController.signUp(context);
-                    }
+                child: StatefulBuilder(
+                  builder: (context, setState) {
+                    signupController.setButtonState = setState;
+                    return CustomButton(
+                      focusNode: signupController.signupButtonFocus,
+                      text: 'signUpButtonLabel',
+                      onPressed: () async {
+                        await signupController.signUp(context);
+                      },
+                      noAction: signupController.noAction,
+                      isLoading: signupController.isLoading,
+                    );
+                  },
                 ),
               ),
             ],

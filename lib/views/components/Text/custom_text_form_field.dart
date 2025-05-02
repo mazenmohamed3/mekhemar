@@ -9,6 +9,8 @@ class CustomTextFormField extends StatefulWidget {
   final FocusNode? focus;
   final String hintText;
   final TextInputType? keyboardType;
+  final void Function(String)? onFieldSubmitted;
+  final void Function()? onTapOutside;
 
   const CustomTextFormField({
     super.key,
@@ -19,6 +21,8 @@ class CustomTextFormField extends StatefulWidget {
     this.validator,
     this.focus,
     this.keyboardType,
+    this.onFieldSubmitted,
+    this.onTapOutside,
   });
 
   @override
@@ -31,7 +35,6 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   void initState() {
     super.initState();
-    // Set initial obscureText value
     _obscureText = widget.obscureText ?? false;
   }
 
@@ -40,8 +43,13 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return TextFormField(
       controller: widget.controller,
       focusNode: widget.focus,
+      autovalidateMode: AutovalidateMode.onUnfocus,
       keyboardType: widget.keyboardType,
-      onTapOutside: (event) => widget.focus?.unfocus(),
+      onFieldSubmitted: (value) => widget.onFieldSubmitted!(value),
+      onTapOutside: (event) {
+        widget.focus?.unfocus();
+        widget.onTapOutside!();
+      },
       obscureText: _obscureText,
       decoration: InputDecoration(
         labelText: widget.label.tr(),

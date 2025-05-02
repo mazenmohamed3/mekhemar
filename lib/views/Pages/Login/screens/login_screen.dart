@@ -12,16 +12,11 @@ import '../../../components/Text/custom_text_form_field.dart';
 import '../../../components/button/custom_button.dart';
 import '../../../components/other/logo_widget.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   final LoginController loginController;
 
   const LoginScreen({super.key, required this.loginController});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Form(
-            key: widget.loginController.formKey,
+            key: loginController.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 20,
@@ -42,59 +37,81 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 CustomTextFormField(
-                  focus: widget.loginController.emailFocus,
-                  controller: widget.loginController.emailController,
+                  focus: loginController.emailFocus,
+                  controller: loginController.emailController,
                   keyboardType: TextInputType.emailAddress,
-
+                  onFieldSubmitted: loginController.onFieldSubmitted,
+                  onTapOutside: loginController.onTapOutside,
                   label: "emailLabel",
                   hintText: "emailHint",
                   validator:
-                      (value) => widget.loginController.emailValidator(value),
+                      (value) => loginController.emailValidator(value),
                 ),
                 CustomTextFormField(
-                  focus: widget.loginController.passwordFocus,
-                  controller: widget.loginController.passwordController,
+                  focus: loginController.passwordFocus,
+                  controller: loginController.passwordController,
                   keyboardType: TextInputType.visiblePassword,
+                  onFieldSubmitted: loginController.onFieldSubmitted,
+                  onTapOutside: loginController.onTapOutside,
                   label: "passwordLabel",
                   hintText: "passwordHint",
                   obscureText: true,
                   validator:
                       (value) =>
-                          widget.loginController.passwordValidator(value),
+                          loginController.passwordValidator(value),
                 ),
                 Row(
                   children: [
-                    Checkbox(
-                      value: widget.loginController.rememberMe,
-                      onChanged:
-                          (value) => setState(
-                            () => widget.loginController.toggleRememberMe(
-                              value!,
-                            ),
-                          ),
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        loginController.setRememberMeState = setState;
+                        return Checkbox(
+                          value: loginController.rememberMe,
+                          onChanged:
+                              (value) => setState(
+                                () => loginController.toggleRememberMe(
+                                  value: value!,
+                                ),
+                              ),
+                        );
+                      },
                     ),
                     CustomText(text: 'rememberMeLabel'),
                     const Spacer(),
                     TextButton(
-                      onPressed:
-                          () => context.push(AppPage.forgotPassword,),
+                      onPressed: () => context.push(AppPage.forgotPassword),
                       child: Text('forgotPasswordButtonLabel'.tr()),
                     ),
                   ],
                 ),
-                CustomButton(
-                  text: 'loginButtonLabel',
-                  onPressed:
-                      () async => await widget.loginController
-                          .loginWithEmailAndPassword(context: context),
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    loginController.setEmailButtonState = setState;
+                    return CustomButton(
+                      focusNode: loginController.loginButtonFocus,
+                      text: 'loginButtonLabel',
+                      onPressed:
+                          () async => await loginController
+                              .loginWithEmailAndPassword(context: context),
+                      noAction: loginController.isEmailNoAction,
+                      isLoading: loginController.isEmailLoading,
+                    );
+                  },
                 ),
-                CustomButton(
-                  icon: Image.asset(Assets.googleIcon, height: 24),
-                  showIcon: true,
-                  text: "googleButtonLabel",
-                  onPressed:
-                      () async => await widget.loginController
-                          .loginWithGoogle(context: context),
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    loginController.setGoogleButtonState = setState;
+                    return CustomButton(
+                      icon: Image.asset(Assets.googleIcon, height: 24),
+                      showIcon: true,
+                      text: "googleButtonLabel",
+                      onPressed:
+                          () async => await loginController
+                              .loginWithGoogle(context: context),
+                      noAction: loginController.isGoogleNoAction,
+                      isLoading: loginController.isGoogleLoading,
+                    );
+                  },
                 ),
                 RichText(
                   textAlign: TextAlign.center,
@@ -107,7 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ), // Default color (you can adjust if needed)
                       ),
                       TextSpan(
-                        text: "createAccountButtonLabel".tr(), // Highlighted text
+                        text: "createAccountButtonLabel".tr(),
+                        // Highlighted text
                         style: AppTheme.textTheme.labelLarge!.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                         ),

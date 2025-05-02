@@ -2,85 +2,77 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mekhemar/views/components/Snack%20Bar/failed_snackbar.dart';
+import '../../../../models/user_model.dart';
 import '../../../../views/components/Dialog/stay_signed_in_dialog.dart';
 import '../../../Router/app_page.dart';
-import '../../../repo/local/secure_storage_helper.dart';
+import '../services/auth_service.dart';
 
 class AuthDatasource {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  UserCredential? userMessage;
+  AuthDatasource(AuthService loginService) : _loginService = loginService;
 
-  Future<UserCredential> emailAndPasswordLogin({
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _loginService;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static UserCredential? userMessage;
+
+  Future<FirebaseAuthResult> emailAndPasswordLogin({
     required String email,
     required String password,
     required bool rememberMe,
+    required BuildContext context,
   }) async {
     try {
+      // Sign in using email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      userMessage = userCredential;
 
+      // Save the UserCredential to the class variable
+      userMessage = userCredential; // <-- Add this line
+
+      final user = FirebaseAuthResult.fromUser(userCredential.user!);
+
+      // Save user credentials if rememberMe is true
       if (rememberMe) {
-        await SecureStorageHelper.writeValueToKey(key: "email", value: email);
-        await SecureStorageHelper.writeValueToKey(
-          key: "password",
-          value: password,
-        );
-        await SecureStorageHelper.writeValueToKey(
-          key: "isGoogleSignIn",
-          value: "false",
+        await _loginService.saveLogin(
+          email: user.email,
+          password: password,
+          username: user.displayName ?? '',
+          isGoogleSignIn: false,
         );
       } else {
-        await clearSavedLogin();
+        await _loginService.clearSavedLogin();
       }
 
-      return userCredential;
+      // Return custom FirebaseAuthResult model
+      return user;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
+      if (context.mounted) {
+        showFailedSnackBar(
+          context,
+          title: _loginService.handleFirebaseAuthException(e),
+        );
+      }
+      rethrow;
     }
   }
 
-  Future<Map<String, String?>> loadSavedLogin() async {
-    final email = await SecureStorageHelper.readValueFromKey(key: "email");
-    final password = await SecureStorageHelper.readValueFromKey(
-      key: "password",
-    );
-    final isGoogleSignIn = await SecureStorageHelper.readValueFromKey(
-      key: "isGoogleSignIn",
-    );
-    return {
-      "email": email,
-      "password": password,
-      "isGoogleSignIn": isGoogleSignIn,
-    };
-  }
-
-  Future<void> clearSavedLogin() async {
-    await SecureStorageHelper.deleteValueFromKey(key: "email");
-    await SecureStorageHelper.deleteValueFromKey(key: "password");
-    await SecureStorageHelper.deleteValueFromKey(key: "isGoogleSignIn");
-  }
-
-  Future<UserCredential> signUp({
+  Future<FirebaseAuthResult> signUp({
     required String email,
     required String password,
     required String name,
     required BuildContext context,
   }) async {
     try {
-      // Create the user with email and password
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      // Update the user's display name
       await userCredential.user?.updateDisplayName(name);
       await userCredential.user?.reload();
 
-      final updatedUser = _auth.currentUser;
-      print("User's name is now: ${updatedUser?.displayName}");
+      userMessage = userCredential; // <-- Add this line
 
       bool rememberMe = false;
 
@@ -93,40 +85,41 @@ class AuthDatasource {
 
         rememberMe = choice ?? false;
       }
+      final user = FirebaseAuthResult.fromUser(userCredential.user!);
 
       if (rememberMe) {
-        await SecureStorageHelper.writeValueToKey(key: "email", value: email);
-        await SecureStorageHelper.writeValueToKey(
-          key: "password",
-          value: password,
-        );
-        await SecureStorageHelper.writeValueToKey(
-          key: "isGoogleSignIn",
-          value: "false",
+        await _loginService.saveLogin(
+          email: user.email,
+          password: password,
+          username: name,
+          isGoogleSignIn: false,
         );
       } else {
-        await clearSavedLogin();
+        await _loginService.clearSavedLogin();
       }
 
-      return userCredential;
+      return user;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
+      if (context.mounted) {
+        showFailedSnackBar(
+          context,
+          title: _loginService.handleFirebaseAuthException(e),
+        );
+      }
+      rethrow;
     }
   }
 
-  Future<UserCredential?> signInWithGoogle({
+  Future<FirebaseAuthResult?> signInWithGoogle({
     required BuildContext context,
     bool showDialogPrompt = true,
   }) async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-      if (googleUser == null) {
-        throw Exception('Google sign-in aborted');
-      }
+      if (googleUser == null) throw 'googleSignInAborted';
 
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -147,25 +140,35 @@ class AuthDatasource {
 
         rememberMe = choice ?? false;
       }
+      final user = FirebaseAuthResult.fromUser(userCredential.user!);
 
+      // Save login credentials if rememberMe is true
       if (rememberMe) {
-        await SecureStorageHelper.writeValueToKey(
-          key: "email",
-          value: googleUser.email,
-        );
-        await SecureStorageHelper.writeValueToKey(
-          key: "isGoogleSignIn",
-          value: "true",
+        await _loginService.saveLogin(
+          email: user.email,
+          password: '',
+          username: user.displayName ?? '',
+          isGoogleSignIn: true,
         );
       } else if (showDialogPrompt) {
-        await clearSavedLogin();
+        await _loginService.clearSavedLogin();
       }
 
-      print('Google sign-in successful: $userCredential');
-      return userCredential;
+      // Returning a custom result model (FirebaseAuthResult)
+      return user;
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        showFailedSnackBar(
+          context,
+          title: _loginService.handleFirebaseAuthException(e),
+        );
+      }
+      rethrow;
     } catch (e) {
-      print('Google sign-in error: $e');
-      throw Exception('Google sign-in failed');
+      if (context.mounted) {
+        showFailedSnackBar(context, title: e.toString());
+      }
+      rethrow;
     }
   }
 
@@ -173,17 +176,20 @@ class AuthDatasource {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
+      throw _loginService.handleFirebaseAuthException(e);
     }
+  }
+
+  Future<Map<String, String?>> loadSavedLogin() async {
+    return await _loginService.loadSavedLogin();
   }
 
   void logout(BuildContext context) async {
     await _auth.signOut();
     await _googleSignIn.signOut();
     userMessage = null;
-    await clearSavedLogin();
+    await _loginService.clearSavedLogin();
     if (!context.mounted) return;
-    //TODO: remove navigation from here
     context.go(AppPage.login);
   }
 }
