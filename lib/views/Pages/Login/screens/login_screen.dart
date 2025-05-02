@@ -98,7 +98,7 @@ class LoginScreen extends StatelessWidget {
                   },
                 ),
                 // Conditionally show the Apple/Google Button
-                if (!Platform.isWindows) ...[
+                if (Platform.isWindows || !Platform.isIOS || !Platform.isMacOS) ...[
                   // Only show Google button if not on Windows
                   StatefulBuilder(
                     builder: (context, setState) {
