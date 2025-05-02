@@ -45,8 +45,7 @@ class LoginScreen extends StatelessWidget {
                   onTapOutside: loginController.onTapOutside,
                   label: "emailLabel",
                   hintText: "emailHint",
-                  validator:
-                      (value) => loginController.emailValidator(value),
+                  validator: (value) => loginController.emailValidator(value),
                 ),
                 CustomTextFormField(
                   focus: loginController.passwordFocus,
@@ -58,8 +57,7 @@ class LoginScreen extends StatelessWidget {
                   hintText: "passwordHint",
                   obscureText: true,
                   validator:
-                      (value) =>
-                      loginController.passwordValidator(value),
+                      (value) => loginController.passwordValidator(value),
                 ),
                 Row(
                   children: [
@@ -71,9 +69,9 @@ class LoginScreen extends StatelessWidget {
                           onChanged:
                               (value) => setState(
                                 () => loginController.toggleRememberMe(
-                              value: value!,
-                            ),
-                          ),
+                                  value: value!,
+                                ),
+                              ),
                         );
                       },
                     ),
@@ -93,30 +91,14 @@ class LoginScreen extends StatelessWidget {
                       text: 'loginButtonLabel',
                       onPressed:
                           () async => await loginController
-                          .loginWithEmailAndPassword(context: context),
+                              .loginWithEmailAndPassword(context: context),
                       noAction: loginController.isEmailNoAction,
                       isLoading: loginController.isEmailLoading,
                     );
                   },
                 ),
                 // Conditionally show the Apple/Google Button
-                if (Platform.isIOS) ...[
-                  StatefulBuilder(
-                    builder: (context, setState) {
-                      loginController.setAppleButtonState = setState;
-                      return CustomButton(
-                        icon: Image.asset(Assets.appleIcon, height: 24),
-                        showIcon: true,
-                        text: "appleButtonLabel",
-                        onPressed:
-                            () async => await loginController
-                            .loginWithApple(context: context),
-                        noAction: loginController.isAppleNoAction,
-                        isLoading: loginController.isAppleLoading,
-                      );
-                    },
-                  ),
-                ] else if (!Platform.isWindows) ...[
+                if (!Platform.isWindows) ...[
                   // Only show Google button if not on Windows
                   StatefulBuilder(
                     builder: (context, setState) {
@@ -126,8 +108,9 @@ class LoginScreen extends StatelessWidget {
                         showIcon: true,
                         text: "googleButtonLabel",
                         onPressed:
-                            () async => await loginController
-                            .loginWithGoogle(context: context),
+                            () async => await loginController.loginWithGoogle(
+                              context: context,
+                            ),
                         noAction: loginController.isGoogleNoAction,
                         isLoading: loginController.isGoogleLoading,
                       );
@@ -151,11 +134,11 @@ class LoginScreen extends StatelessWidget {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         recognizer:
-                        TapGestureRecognizer()
-                          ..onTap =
-                              () => context.push(
-                            AppPage.signup,
-                          ), // Navigate to signup page on tap
+                            TapGestureRecognizer()
+                              ..onTap =
+                                  () => context.push(
+                                    AppPage.signup,
+                                  ), // Navigate to signup page on tap
                       ),
                     ],
                   ),

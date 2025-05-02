@@ -20,7 +20,6 @@ class LoginController {
   late void Function(void Function()) setEmailButtonState;
   late void Function(void Function()) setGoogleButtonState;
   late void Function(void Function()) setRememberMeState;
-  late void Function(void Function()) setAppleButtonState;
 
   bool rememberMe = false;
   bool isEmailNoAction = true;
@@ -28,7 +27,6 @@ class LoginController {
   bool isAppleNoAction = false;
   bool isEmailLoading = false;
   bool isGoogleLoading = false;
-  bool isAppleLoading = false;
 
   void toggleRememberMe({bool? value}) {
     if (value == null) {
@@ -48,10 +46,6 @@ class LoginController {
     } else if (isGoogle == true) {
       setGoogleButtonState(() {
         isGoogleNoAction = value;
-      });
-    } else if (isApple == true) {
-      setAppleButtonState(() {
-        isAppleNoAction = value;
       });
     } else {
       setEmailButtonState(() {
@@ -108,7 +102,6 @@ class LoginController {
     if (value == null) {
       isGoogleLoading = false;
       isEmailLoading = false;
-      isAppleLoading = false; // Reset Apple loading state
     } else if (isGoogle == true) {
       setGoogleButtonState(() {
         isGoogleLoading = value;
@@ -118,16 +111,7 @@ class LoginController {
         isGoogle: isGoogle,
         isApple: isApple,
       ); // Pass Apple state as well
-    } else if (isApple == true) {
-      setAppleButtonState(() {
-        isAppleLoading = value;
-      });
-      toggleNoAction(
-        value: value,
-        isGoogle: isGoogle,
-        isApple: isApple,
-      ); // Pass Google and Apple states
-    } else {
+    }else {
       setEmailButtonState(() {
         isEmailLoading = value;
       });
@@ -176,18 +160,6 @@ class LoginController {
       context.go(AppPage.home);
     } finally {
       toggleIsLoading(value: false, isGoogle: true);
-    }
-  }
-
-  Future<void> loginWithApple({required BuildContext context}) async {
-    try {
-      toggleIsLoading(value: true, isApple: true);
-      await authDataSource.signInWithApple(context: context);
-      if (!context.mounted) return;
-      dispose();
-      context.go(AppPage.home);
-    } finally {
-      toggleIsLoading(value: false, isApple: true);
     }
   }
 

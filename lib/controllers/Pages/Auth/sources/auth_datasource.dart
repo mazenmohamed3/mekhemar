@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mekhemar/views/components/Snack%20Bar/failed_snackbar.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../../models/user_model.dart';
 import '../../../../views/components/Dialog/stay_signed_in_dialog.dart';
 import '../../../Router/app_page.dart';
@@ -156,69 +155,6 @@ class AuthDatasource {
       }
 
       // Returning a custom result model (FirebaseAuthResult)
-      return user;
-    } on FirebaseAuthException catch (e) {
-      if (context.mounted) {
-        showFailedSnackBar(
-          context,
-          title: _loginService.handleFirebaseAuthException(e),
-        );
-      }
-      rethrow;
-    } catch (e) {
-      if (context.mounted) {
-        showFailedSnackBar(context, title: e.toString());
-      }
-      rethrow;
-    }
-  }
-
-  Future<FirebaseAuthResult?> signInWithApple({
-    required BuildContext context,
-  }) async {
-    try {
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
-
-      final oauthCredential = OAuthProvider("apple.com").credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
-
-      final userCredential = await _auth.signInWithCredential(oauthCredential);
-      userMessage = userCredential;
-
-      bool rememberMe = false;
-
-      if (context.mounted) {
-        final bool? choice = await showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => const StaySignedInDialog(),
-        );
-
-        rememberMe = choice ?? false;
-      }
-
-      final user = FirebaseAuthResult.fromUser(userCredential.user!);
-
-      // Save login credentials if rememberMe is true
-      if (rememberMe) {
-        await _loginService.saveLogin(
-          email: user.email,
-          password: '',
-          username: user.displayName ?? '',
-          isGoogleSignIn: false,
-        );
-      } else {
-        await _loginService.clearSavedLogin();
-      }
-
-      // Returning custom FirebaseAuthResult model
       return user;
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
