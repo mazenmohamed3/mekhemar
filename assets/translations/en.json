@@ -47,5 +47,29 @@
 
   "resetPasswordSuccessDialogTitle": "Password Reset Successful",
   "resetPasswordSuccessDialogSubtitle": "Your password has been successfully reset. You will now be redirected to the login screen.",
-  "resetPasswordOkayButtonLabel": "Okay"
+  "resetPasswordOkayButtonLabel": "Okay",
+
+  "invalidEmailOrPassword": "Invalid email or password.",
+  "userDisabled": "User account has been disabled.",
+  "tooManyRequests": "Too many login attempts. Try again later.",
+  "networkError": "No internet connection.",
+  "emailAlreadyInUse": "The email address is already in use by another account.",
+  "weakPassword": "The password is too weak.",
+  "unknownError": "An unknown error occurred.",
+
+  "googleSignInAborted": "Google sign-in aborted",
+
+  "pleaseEnterEmail": "Please enter an email address",
+  "invalidEmail": "Please enter a valid email address",
+  "pleaseEnterUsername": "Please enter a username",
+  "usernameTooShort": "Username must be at least 3 characters long",
+  "pleaseEnterPassword": "Please enter a password",
+  "passwordTooShort": "Password must be at least 6 characters long",
+  "pleaseConfirmPassword": "Please confirm your password",
+  "passwordsDoNotMatch": "Passwords do not match",
+
+  "biometricFailed": "Biometric authentication failed. Please try again.",
+  "biometricUnsupported": "Your device does not support biometric authentication.",
+  "loginFailed": "Login failed: {0}",
+  "noSavedCredentials": "No saved credentials found. Please log in manually."
 }

@@ -52,7 +52,7 @@ class CustomText extends StatelessWidget {
         fontStyle: fontStyle,
         color: color ?? defaultColor,
         fontWeight: fontWeight,
-        height: height,
+        height: height.h,
       )
           : GoogleFonts.tajawal(
         decoration: textDecoration,
@@ -61,7 +61,7 @@ class CustomText extends StatelessWidget {
         fontStyle: fontStyle,
         color: color ?? defaultColor,
         fontWeight: fontWeight,
-        height: height,
+        height: height.h,
       ),
     );
   }
