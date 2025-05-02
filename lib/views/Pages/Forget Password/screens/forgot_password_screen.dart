@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../controllers/Pages/Auth/Forget Password/controllers/forget_password_controller.dart';
 import '../../../components/Text/custom_text.dart';
 import '../../../components/Text/custom_text_form_field.dart';
@@ -23,6 +24,13 @@ class ForgetPasswordScreen extends StatelessWidget {
           text: 'forgotPasswordAppbarTitle',
           fontSize: 20.sp,
           textAlign: TextAlign.center,
+        ),
+        leading: IconButton(
+          onPressed: () {
+            forgetPasswordController.dispose();
+            context.pop();
+          },
+          icon: Icon(Icons.arrow_back),
         ),
         centerTitle: true,
       ),
@@ -54,6 +62,8 @@ class ForgetPasswordScreen extends StatelessWidget {
                             controller:
                                 forgetPasswordController.emailController,
                             keyboardType: TextInputType.emailAddress,
+                            onFieldSubmitted: forgetPasswordController.onFieldSubmitted,
+                            onTapOutside: forgetPasswordController.onTapOutside,
                             label: "forgetPasswordLabel",
                             hintText: "forgetPasswordHint",
                             validator:
@@ -68,12 +78,19 @@ class ForgetPasswordScreen extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0.h),
-                child: CustomButton(
-                  text: 'forgetPasswordButtonLabel',
-                  onPressed:
-                      () async => await forgetPasswordController.resetPassword(
+                child: StatefulBuilder(
+                  builder: (context, setState) {
+                    forgetPasswordController.setButtonState = setState;
+                    return CustomButton(
+                      text: 'forgetPasswordButtonLabel',
+                      onPressed:
+                          () async => await forgetPasswordController.resetPassword(
                         context: context,
                       ),
+                      noAction: forgetPasswordController.noAction,
+                      isLoading: forgetPasswordController.isLoading,
+                    );
+                  },
                 ),
               ),
             ],

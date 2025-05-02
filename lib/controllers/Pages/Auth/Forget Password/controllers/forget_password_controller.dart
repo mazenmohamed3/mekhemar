@@ -2,58 +2,99 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../views/components/Dialog/reset_password_success_dialog.dart';
 import '../../../../Router/app_page.dart';
+import '../../services/auth_service.dart';
 import '../../sources/auth_datasource.dart';
 
 class ForgetPasswordController {
-  ForgetPasswordController(this.authDataSource);
+  ForgetPasswordController(this.authDataSource, this.loginService);
 
   final AuthDatasource authDataSource;
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Declare the formKey here for the current form.
+  final AuthService loginService;
+
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final FocusNode emailFocus = FocusNode();
+  final FocusNode resetButtonFocus = FocusNode();
   final TextEditingController emailController = TextEditingController();
 
-  // Email validator
-  String? emailValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter an email address';
+  late void Function(void Function()) setButtonState;
+  bool noAction = true;
+  bool isLoading = false;
+
+  String? emailValidator(String? value) => loginService.validateEmail(value);
+
+  void toggleNoAction({bool? value}) {
+    if (value == null) {
+      noAction = true;
+    } else {
+      setButtonState(() {
+        noAction = value;
+      });
     }
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
-    }
-    return null;
   }
 
-  // Password reset method
+  void toggleIsLoading({bool? value}) {
+    if (value == null) {
+      isLoading = false;
+    } else if (value) {
+      isLoading = value;
+      toggleNoAction(value: value);
+    } else {
+      isLoading = value;
+      toggleNoAction(value: value);
+    }
+  }
+
+  void onTapOutside() {
+    if (emailController.text.isNotEmpty && formKey.currentState!.validate()) {
+      toggleNoAction(value: false);
+    } else {
+      toggleNoAction(value: true);
+    }
+  }
+
+  void onFieldSubmitted(String value) {
+    final isEmailValid = emailValidator(value) == null;
+
+    if (emailFocus.hasFocus && !isEmailValid) {
+      emailFocus.unfocus();
+      Future.microtask(() {
+        emailFocus.requestFocus();
+        toggleNoAction(value: true);
+      });
+    } else {
+      toggleNoAction(value: false);
+      resetButtonFocus
+        ..canRequestFocus = true
+        ..requestFocus();
+    }
+  }
+
   Future<void> resetPassword({required BuildContext context}) async {
     if (formKey.currentState!.validate()) {
       try {
-        await authDataSource.resetPassword(email: emailController.text).then((value) async {
-          if (!context.mounted) return;
+        toggleIsLoading(value: true);
+        await authDataSource.resetPassword(email: emailController.text);
 
-          // Show the success dialog
-          await showDialog<void>(
-            context: context,
-            barrierDismissible: false, // User must press a button to dismiss
-            builder: (BuildContext context) {
-              return const ResetPasswordSuccessDialog(); // Use the imported dialog
-            },
-          );
+        if (!context.mounted) return;
 
-          if (!context.mounted) return;
-          dispose();
-          context.go(AppPage.login);
-        });
-      } catch (e) {
-        print(e);
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) => const ResetPasswordSuccessDialog(),
+        );
+
+        if (!context.mounted) return;
+        dispose();
+        context.go(AppPage.login);
+      } finally {
+        toggleIsLoading(value: false);
       }
     }
   }
 
   void dispose() {
-    emailController.text = '';
+    toggleNoAction();
+    toggleIsLoading();
+    emailController.clear();
   }
-
 }
