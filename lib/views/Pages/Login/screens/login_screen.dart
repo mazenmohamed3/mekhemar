@@ -1,3 +1,4 @@
+import 'dart:io'; // Import this for platform checks
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class LoginScreen extends StatelessWidget {
                   obscureText: true,
                   validator:
                       (value) =>
-                          loginController.passwordValidator(value),
+                      loginController.passwordValidator(value),
                 ),
                 Row(
                   children: [
@@ -70,9 +71,9 @@ class LoginScreen extends StatelessWidget {
                           onChanged:
                               (value) => setState(
                                 () => loginController.toggleRememberMe(
-                                  value: value!,
-                                ),
-                              ),
+                              value: value!,
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -92,27 +93,47 @@ class LoginScreen extends StatelessWidget {
                       text: 'loginButtonLabel',
                       onPressed:
                           () async => await loginController
-                              .loginWithEmailAndPassword(context: context),
+                          .loginWithEmailAndPassword(context: context),
                       noAction: loginController.isEmailNoAction,
                       isLoading: loginController.isEmailLoading,
                     );
                   },
                 ),
-                StatefulBuilder(
-                  builder: (context, setState) {
-                    loginController.setGoogleButtonState = setState;
-                    return CustomButton(
-                      icon: Image.asset(Assets.googleIcon, height: 24),
-                      showIcon: true,
-                      text: "googleButtonLabel",
-                      onPressed:
-                          () async => await loginController
-                              .loginWithGoogle(context: context),
-                      noAction: loginController.isGoogleNoAction,
-                      isLoading: loginController.isGoogleLoading,
-                    );
-                  },
-                ),
+                // Conditionally show the Apple/Google Button
+                if (Platform.isIOS) ...[
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      loginController.setAppleButtonState = setState;
+                      return CustomButton(
+                        icon: Image.asset(Assets.appleIcon, height: 24),
+                        showIcon: true,
+                        text: "appleButtonLabel",
+                        onPressed:
+                            () async => await loginController
+                            .loginWithApple(context: context),
+                        noAction: loginController.isAppleNoAction,
+                        isLoading: loginController.isAppleLoading,
+                      );
+                    },
+                  ),
+                ] else if (!Platform.isWindows) ...[
+                  // Only show Google button if not on Windows
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      loginController.setGoogleButtonState = setState;
+                      return CustomButton(
+                        icon: Image.asset(Assets.googleIcon, height: 24),
+                        showIcon: true,
+                        text: "googleButtonLabel",
+                        onPressed:
+                            () async => await loginController
+                            .loginWithGoogle(context: context),
+                        noAction: loginController.isGoogleNoAction,
+                        isLoading: loginController.isGoogleLoading,
+                      );
+                    },
+                  ),
+                ],
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -130,11 +151,11 @@ class LoginScreen extends StatelessWidget {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         recognizer:
-                            TapGestureRecognizer()
-                              ..onTap =
-                                  () => context.push(
-                                    AppPage.signup,
-                                  ), // Navigate to signup page on tap
+                        TapGestureRecognizer()
+                          ..onTap =
+                              () => context.push(
+                            AppPage.signup,
+                          ), // Navigate to signup page on tap
                       ),
                     ],
                   ),
