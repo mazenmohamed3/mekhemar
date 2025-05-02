@@ -16,7 +16,7 @@ class StaySignedInDialog extends StatelessWidget {
           children: [
             Expanded(
               child: CustomButton(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: Theme.of(context).colorScheme.onError,
                   onPressed: () {
                   context.pop(false); // No
                 },

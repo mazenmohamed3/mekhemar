@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekhemar/controllers/Router/app_page.dart';
 
-import '../../../../../models/user_model.dart';
+import '../../services/auth_service.dart';
 import '../../sources/auth_datasource.dart';
 
 class SignupController {
-  SignupController(this.authDataSource);
+  SignupController(AuthDatasource authDataSource, AuthService authService)
+    : _authDataSource = authDataSource,
+      _authService = authService;
 
-  final AuthDatasource authDataSource;
+  final AuthDatasource _authDataSource;
+  final AuthService _authService;
   final formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final FocusNode emailFocus = FocusNode();
@@ -16,81 +19,174 @@ class SignupController {
   final FocusNode usernameFocus = FocusNode();
   final TextEditingController passwordController = TextEditingController();
   final FocusNode passwordFocus = FocusNode();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final FocusNode confirmPasswordFocus = FocusNode();
+  final FocusNode signupButtonFocus = FocusNode();
+  late void Function(void Function()) setButtonState;
+  bool noAction = true;
+  bool isLoading = false;
+
+  void toggleNoAction({bool? value}) {
+    if (value == null) {
+      noAction = true;
+    } else {
+      setButtonState(() {
+        noAction = value;
+      });
+    }
+  }
+
+  void toggleIsLoading({bool? value}) {
+    if (value == null) {
+      isLoading = false;
+    } else if (value) {
+      isLoading = value;
+      toggleNoAction(value: value);
+    } else {
+      isLoading = value;
+      toggleNoAction(value: value);
+    }
+  }
+
+  void onFieldSubmitted(String value) {
+    final isUsernameValid = usernameValidator(usernameController.text) == null;
+    final isEmailValid = emailValidator(emailController.text) == null;
+    final isPasswordValid = passwordValidator(passwordController.text) == null;
+    final isConfirmPasswordValid =
+        confirmPasswordValidator(confirmPasswordController.text) == null;
+
+    bool allValid =
+        isUsernameValid &&
+        isEmailValid &&
+        isPasswordValid &&
+        isConfirmPasswordValid;
+
+    if (usernameFocus.hasFocus && !allValid) {
+      usernameFocus.unfocus();
+
+      Future.microtask(() {
+        if (!isUsernameValid) {
+          usernameFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isEmailValid) {
+          emailFocus.requestFocus();
+        } else if (!isPasswordValid) {
+          passwordFocus.requestFocus();
+        } else if (!isConfirmPasswordValid) {
+          confirmPasswordFocus.requestFocus();
+        }
+      });
+    } else if (emailFocus.hasFocus && !allValid) {
+      emailFocus.unfocus();
+
+      Future.microtask(() {
+        if (!isEmailValid) {
+          emailFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isUsernameValid) {
+          usernameFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isPasswordValid) {
+          passwordFocus.requestFocus();
+        } else if (!isConfirmPasswordValid) {
+          confirmPasswordFocus.requestFocus();
+        }
+      });
+    } else if (passwordFocus.hasFocus && !allValid) {
+      passwordFocus.unfocus();
+
+      Future.microtask(() {
+        if (!isPasswordValid) {
+          passwordFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isUsernameValid) {
+          usernameFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isEmailValid) {
+          emailFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isConfirmPasswordValid) {
+          confirmPasswordFocus.requestFocus();
+        }
+      });
+    } else if (confirmPasswordFocus.hasFocus && !allValid) {
+      confirmPasswordFocus.unfocus();
+
+      Future.microtask(() {
+        if (!isConfirmPasswordValid && isPasswordValid) {
+          confirmPasswordFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isUsernameValid) {
+          usernameFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isEmailValid) {
+          emailFocus.requestFocus();
+          toggleNoAction(value: true);
+        } else if (!isPasswordValid) {
+          passwordFocus.requestFocus();
+          toggleNoAction(value: true);
+        }
+      });
+    } else {
+      toggleNoAction(value: false);
+      signupButtonFocus
+        ..canRequestFocus = true
+        ..requestFocus();
+    }
+  }
+
+  void onTapOutside() {
+    if (usernameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty &&
+        confirmPasswordController.text.isNotEmpty) {
+      if (formKey.currentState!.validate()) {
+        toggleNoAction(value: false);
+      }
+    } else {
+      toggleNoAction(value: true);
+    }
+  }
+
+  String? emailValidator(String? value) => _authService.validateEmail(value);
+
+  String? usernameValidator(String? value) =>
+      _authService.validateUsername(value);
+
+  String? passwordValidator(String? value) =>
+      _authService.validatePassword(value);
+
+  String? confirmPasswordValidator(String? value) =>
+      _authService.validateConfirmPassword(value, passwordController.text);
 
   Future<void> signUp(BuildContext context) async {
     if (formKey.currentState!.validate()) {
-      final newUser = User(
-        email: emailController.text,
-        username: usernameController.text,
-        password: passwordController.text,
-      );
+      try {
+        toggleIsLoading(value: true);
 
-      await authDataSource.signUp(
-        context: context,
-        email: newUser.email,
-        password: newUser.password,
-        name: newUser.username,
-      );
+        await _authDataSource.signUp(
+          context: context,
+          email: emailController.text,
+          password: usernameController.text,
+          name: passwordController.text,
+        );
 
-      if (!context.mounted) return;
-      dispose();
-      context.go(AppPage.home);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User already exists')),
-      );
+        if (!context.mounted) return;
+        dispose();
+        context.go(AppPage.home);
+      } finally {
+        toggleIsLoading(value: false);
+      }
     }
-  }
-
-  String? emailValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter an email address';
-    }
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
-    }
-    return null;
-  }
-
-  String? usernameValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a username';
-    }
-    if (value.length < 3) {
-      return 'Username must be at least 3 characters long';
-    }
-    return null;
-  }
-
-  String? passwordValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a password';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-    return null;
-  }
-
-  String? confirmPasswordValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
-    }
-    if (value != passwordController.text) {
-      return 'Passwords do not match';
-    }
-    return null;
   }
 
   void dispose() {
-    emailController.text = '';
-    usernameController.text = '';
-    passwordController.text = '';
-    confirmPasswordController.text = '';
+    toggleNoAction();
+    toggleIsLoading();
+    emailController.clear();
+    usernameController.clear();
+    passwordController.clear();
+    confirmPasswordController.clear();
   }
 }

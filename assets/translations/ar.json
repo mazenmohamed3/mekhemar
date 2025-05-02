@@ -47,5 +47,29 @@
 
   "resetPasswordSuccessDialogTitle": "تم إعادة تعيين كلمة المرور بنجاح",
   "resetPasswordSuccessDialogSubtitle": "تم إعادة تعيين كلمة المرور بنجاح. سيتم الآن إعادة توجيهك إلى شاشة تسجيل الدخول.",
-  "resetPasswordOkayButtonLabel": "حسنًا"
+  "resetPasswordOkayButtonLabel": "حسنًا",
+
+  "invalidEmailOrPassword": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+  "userDisabled": "تم تعطيل حساب المستخدم.",
+  "tooManyRequests": "عدد كبير جدًا من محاولات تسجيل الدخول. حاول مرة أخرى لاحقًا.",
+  "networkError": "لا يوجد اتصال بالإنترنت.",
+  "emailAlreadyInUse": "عنوان البريد الإلكتروني مستخدم بالفعل من قبل حساب آخر.",
+  "weakPassword": "كلمة المرور ضعيفة جدًا.",
+  "unknownError": "حدث خطأ غير معروف.",
+
+  "googleSignInAborted": "تم إلغاء تسجيل الدخول عبر جوجل",
+
+  "pleaseEnterEmail": "يرجى إدخال عنوان البريد الإلكتروني",
+  "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+  "pleaseEnterUsername": "يرجى إدخال اسم المستخدم",
+  "usernameTooShort": "يجب أن يتكون اسم المستخدم من 3 أحرف على الأقل",
+  "pleaseEnterPassword": "يرجى إدخال كلمة المرور",
+  "passwordTooShort": "يجب أن تكون كلمة المرور لا تقل عن 6 أحرف",
+  "pleaseConfirmPassword": "يرجى تأكيد كلمة المرور",
+  "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+
+  "biometricFailed": "فشل التحقق البيومتري. يرجى المحاولة مرة أخرى.",
+  "biometricUnsupported": "جهازك لا يدعم التحقق البيومتري.",
+  "loginFailed": "فشل تسجيل الدخول: {0}",
+  "noSavedCredentials": "لم يتم العثور على بيانات تسجيل دخول محفوظة. يرجى تسجيل الدخول يدويًا."
 }
