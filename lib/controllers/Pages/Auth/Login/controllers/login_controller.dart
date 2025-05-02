@@ -20,12 +20,15 @@ class LoginController {
   late void Function(void Function()) setEmailButtonState;
   late void Function(void Function()) setGoogleButtonState;
   late void Function(void Function()) setRememberMeState;
+  late void Function(void Function()) setAppleButtonState;
 
   bool rememberMe = false;
   bool isEmailNoAction = true;
   bool isGoogleNoAction = false;
+  bool isAppleNoAction = false;
   bool isEmailLoading = false;
   bool isGoogleLoading = false;
+  bool isAppleLoading = false;
 
   void toggleRememberMe({bool? value}) {
     if (value == null) {
@@ -37,13 +40,18 @@ class LoginController {
     }
   }
 
-  void toggleNoAction({bool? value, bool? isGoogle}) {
+  void toggleNoAction({bool? value, bool? isGoogle, bool? isApple}) {
     if (value == null) {
       isGoogleNoAction = false;
       isEmailNoAction = true;
+      isAppleNoAction = true; // Default no action for Apple
     } else if (isGoogle == true) {
       setGoogleButtonState(() {
         isGoogleNoAction = value;
+      });
+    } else if (isApple == true) {
+      setAppleButtonState(() {
+        isAppleNoAction = value;
       });
     } else {
       setEmailButtonState(() {
@@ -96,20 +104,38 @@ class LoginController {
     }
   }
 
-  void toggleIsLoading({bool? value, bool? isGoogle}) {
+  void toggleIsLoading({bool? value, bool? isGoogle, bool? isApple}) {
     if (value == null) {
       isGoogleLoading = false;
       isEmailLoading = false;
+      isAppleLoading = false; // Reset Apple loading state
     } else if (isGoogle == true) {
       setGoogleButtonState(() {
         isGoogleLoading = value;
       });
-      toggleNoAction(value: value, isGoogle: isGoogle);
-    } else if (isGoogle == false) {
+      toggleNoAction(
+        value: value,
+        isGoogle: isGoogle,
+        isApple: isApple,
+      ); // Pass Apple state as well
+    } else if (isApple == true) {
+      setAppleButtonState(() {
+        isAppleLoading = value;
+      });
+      toggleNoAction(
+        value: value,
+        isGoogle: isGoogle,
+        isApple: isApple,
+      ); // Pass Google and Apple states
+    } else {
       setEmailButtonState(() {
         isEmailLoading = value;
       });
-      toggleNoAction(value: value, isGoogle: isGoogle);
+      toggleNoAction(
+        value: value,
+        isGoogle: isGoogle,
+        isApple: isApple,
+      ); // Pass Google and Apple states
     }
   }
 
@@ -150,6 +176,18 @@ class LoginController {
       context.go(AppPage.home);
     } finally {
       toggleIsLoading(value: false, isGoogle: true);
+    }
+  }
+
+  Future<void> loginWithApple({required BuildContext context}) async {
+    try {
+      toggleIsLoading(value: true, isApple: true);
+      await authDataSource.signInWithApple(context: context);
+      if (!context.mounted) return;
+      dispose();
+      context.go(AppPage.home);
+    } finally {
+      toggleIsLoading(value: false, isApple: true);
     }
   }
 
