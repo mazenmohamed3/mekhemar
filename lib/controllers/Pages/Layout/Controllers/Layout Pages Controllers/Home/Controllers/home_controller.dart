@@ -54,12 +54,19 @@ class HomeController {
   );
 
   ChatUser currentUser = ChatUser(
-  id: "69420",
-  firstName: "Mekhemar",
-  profileImage: "",
+    id: "69420",
+    firstName: "Mekhemar",
+    profileImage: "",
   );
 
   void initState(void Function(void Function()) setState) async {
+    _currentChatSession = _groq.startNewChat(
+      GroqModels.llama3_70b,
+      settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
+    );
+    final message =
+        "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
+    _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
     this.setState = setState;
     user = FirebaseAuth.instance.currentUser;
     messages = [];
@@ -71,6 +78,16 @@ class HomeController {
       profileImage: user?.photoURL ?? "",
     );
     await loadChatHistory();
+  }
+
+  void scrollToBottom(ScrollController controller) {
+    if (controller.hasClients) {
+      controller.animateTo(
+        controller.position.minScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   // == VOICE LOGIC ==
@@ -125,25 +142,25 @@ class HomeController {
     // If the data is not found in secure storage, fetch it from Firestore
     if (jsonString == null) {
       try {
-        final doc = await FirebaseFirestore.instance
-            .collection('chat_histories')
-            .doc(userId)
-            .get();
+        final doc =
+            await FirebaseFirestore.instance
+                .collection('chat_histories')
+                .doc(userId)
+                .get();
 
         if (doc.exists && doc.data()?['data'] != null) {
           final dataField = doc.data()?['data'];
 
           if (dataField is List) {
             // Convert Firestore data to ChatService objects
-            List<ChatService> services = dataField.map((entry) {
-              final map = Map<String, dynamic>.from(entry);
-              return ChatService.fromJson(map);
-            }).toList();
+            List<ChatService> services =
+                dataField.map((entry) {
+                  final map = Map<String, dynamic>.from(entry);
+                  return ChatService.fromJson(map);
+                }).toList();
 
             // Optionally, map to a chatHistory map for easy access later
-            chatHistory = {
-              for (final service in services) service.id: service,
-            };
+            chatHistory = {for (final service in services) service.id: service};
 
             // Flatten all messages from all services
             final allMessages = services.expand((s) => s.messages).toList();
@@ -158,15 +175,19 @@ class HomeController {
 
             await SecureStorageHelper.writeValueToKey(
               key: 'chatMessages_$userId',
-              value: jsonEncode(
-                allMessages.map((m) => m.toJson()).toList(),
-              ),
+              value: jsonEncode(allMessages.map((m) => m.toJson()).toList()),
             );
 
             // Debug logs
-            print("===============================> saving chat history: ${chatHistory.values.map((e) => e.title)}");
-            print("===============================> saving chat messages: ${allMessages.length}");
-            print('===============================> Fetched and saved chat history from Firestore for chatHistory_$userId.');
+            print(
+              "===============================> saving chat history: ${chatHistory.values.map((e) => e.title)}",
+            );
+            print(
+              "===============================> saving chat messages: ${allMessages.length}",
+            );
+            print(
+              '===============================> Fetched and saved chat history from Firestore for chatHistory_$userId.',
+            );
 
             // Now, update the UI by calling setState after fetching from Firestore
             setState(() {
@@ -178,13 +199,19 @@ class HomeController {
               );
             });
           } else {
-            print('===============================> No valid "data" field in Firestore document for $userId.');
+            print(
+              '===============================> No valid "data" field in Firestore document for $userId.',
+            );
           }
         } else {
-          print('===============================> No chat history found in Firestore for $userId.');
+          print(
+            '===============================> No chat history found in Firestore for $userId.',
+          );
         }
       } catch (e) {
-        print('===============================> Error fetching chat history from Firestore: $e');
+        print(
+          '===============================> Error fetching chat history from Firestore: $e',
+        );
       }
     }
 
@@ -221,6 +248,11 @@ class HomeController {
           GroqModels.llama3_70b,
           settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
         );
+
+        // Now send the initial message
+        final message =
+            "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
+        _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
 
         for (final msg in messages.reversed.skip(1)) {
           if (msg.user == currentUser) {
@@ -279,6 +311,9 @@ class HomeController {
 
     if (shouldGenerateTitle) {
       final chatSession = _groq.startNewChat(GroqModels.llama3_70b);
+      final message =
+          "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
+      _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
       final systemPrompt =
           "Generate a concise 3-6 word title capturing the main topic. "
           "Return only the title without quotes, colons, or explanations. "
@@ -346,6 +381,9 @@ class HomeController {
       GroqModels.llama3_70b,
       settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
     );
+    final message =
+        "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
+    _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
 
     final historyPrompt = session.messages.reversed
         .map((msg) => "${msg.user.firstName}: ${msg.text}")
@@ -461,6 +499,11 @@ class HomeController {
         'data': jsonList,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      await SecureStorageHelper.writeValueToKey(
+        key: "chatHistory_$userId",
+        value: jsonEncode(jsonList),
+      );
     } catch (e) {
       print('Error saving chat history to Firestore: $e');
     }

@@ -94,6 +94,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: DashChat(
         currentUser: widget.homeController.currentUser,
+        typingUsers:
+        widget.homeController.isTyping
+            ? [widget.homeController.grokChatUser]
+            : [],
+        messages: widget.homeController.messages,
         onSend: (message) {
           widget.homeController.getChatResponse(
             message: message,
@@ -102,24 +107,39 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         messageOptions: MessageOptions(
           showCurrentUserAvatar: true,
-          containerColor: const Color(0xFFB39DDB), // LLaMA branding color
+          containerColor: const Color(0xFFB39DDB),
+          // LLaMA branding color
           timeFormat: DateFormat(DateFormat.HOUR_MINUTE),
           showTime: true,
           currentUserTextColor: AppTheme.defaultTextColor(context),
           currentUserContainerColor: Theme.of(context).colorScheme.primary,
           textColor: Colors.black,
         ),
-        typingUsers:
-            widget.homeController.isTyping
-                ? [widget.homeController.grokChatUser]
-                : [],
         messageListOptions: MessageListOptions(
           dateSeparatorFormat: DateFormat(DateFormat.HOUR_MINUTE),
           showDateSeparator: true,
           separatorFrequency: SeparatorFrequency.hours,
         ),
-        // No typing indicator needed here
-        messages: widget.homeController.messages,
+        scrollToBottomOptions: ScrollToBottomOptions(
+          scrollToBottomBuilder: (scrollController) => Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 1),
+              child: MaterialButton(
+                onPressed: () => widget.homeController.scrollToBottom(scrollController),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.9 * 255)),
+                elevation: 4,
+                height: 30,
+                shape: const CircleBorder(),
+                child: Icon(
+                  Icons.arrow_downward_rounded,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ),
+        ),
         inputOptions: InputOptions(
           inputDisabled: widget.homeController.isRecording,
           leading: [
