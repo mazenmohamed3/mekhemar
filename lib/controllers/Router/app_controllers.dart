@@ -1,3 +1,5 @@
+import 'package:mekhemar/controllers/Pages/Layout/Controllers/Layout%20Pages%20Controllers/Home/Services/voice_service.dart';
+import 'package:mekhemar/controllers/Pages/Layout/Controllers/Layout%20Pages%20Controllers/Profile/Controllers/profile_controller.dart';
 import 'package:mekhemar/controllers/Pages/Onboarding/controllers/onboarding_controller.dart';
 import 'package:mekhemar/controllers/Pages/Splash/controllers/splash_controller.dart';
 
@@ -13,6 +15,7 @@ import '../Pages/Layout/Controllers/layout_controller.dart';
 class AppControllers {
   //Services
   static AuthService loginService = AuthService();
+  static VoiceService voiceService = VoiceService();
   //Datasources
   static AuthDatasource authDatasource = AuthDatasource(loginService);
   //Controllers
@@ -25,5 +28,6 @@ class AppControllers {
   static ForgetPasswordController forgetPasswordController = ForgetPasswordController(authDatasource, loginService);
   static SignupController signupController = SignupController(authDatasource, loginService);
   static LayoutController layoutController = LayoutController();
-  static HomeController homeController = HomeController();
+  static HomeController homeController = HomeController(voiceService: voiceService);
+  static ProfileController profileController = ProfileController(authDatasource: authDatasource);
 }

@@ -49,6 +49,30 @@ class SignupController {
     }
   }
 
+  void onChanged(String value) {
+    // Validate each field
+    final isEmailValid = emailValidator(emailController.text) == null;
+    final isUsernameValid = usernameValidator(usernameController.text) == null;
+    final isPasswordValid = passwordValidator(passwordController.text) == null;
+    final isConfirmPasswordValid =
+        confirmPasswordValidator(confirmPasswordController.text) == null;
+
+    // Check if all fields are valid and the button is not loading
+    if (isEmailValid &&
+        isUsernameValid &&
+        isPasswordValid &&
+        isConfirmPasswordValid &&
+        !isLoading) {
+      setButtonState(() {
+        noAction = false; // Enable the signup button
+      });
+    } else {
+      setButtonState(() {
+        noAction = true; // Disable the signup button
+      });
+    }
+  }
+
   void onFieldSubmitted(String value) {
     final isUsernameValid = usernameValidator(usernameController.text) == null;
     final isEmailValid = emailValidator(emailController.text) == null;

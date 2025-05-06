@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mekhemar/controllers/Pages/Auth/services/auth_service.dart';
-import 'package:mekhemar/controllers/Pages/Auth/sources/auth_datasource.dart';
 import 'package:mekhemar/views/components/Text/custom_text.dart';
 
 import '../../../../../../../controllers/Generated/Assets/assets.dart';
+import '../../../../../../../controllers/Pages/Layout/Controllers/Layout Pages Controllers/Profile/Controllers/profile_controller.dart';
 import '../widgets/profile_tile_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, required this.profileController});
+
+  final ProfileController profileController;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
               iconHeight: 42.h,
               iconWidth: 42.w,
               title: "Sign out",
-              onPressed: () => AuthDatasource(AuthService()).logout(context),
+              onPressed: () => profileController.logout(context),
               titleColor: Theme.of(context).colorScheme.error,
             ),
           ],

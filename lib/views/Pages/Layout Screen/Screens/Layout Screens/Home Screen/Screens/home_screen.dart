@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:mekhemar/controllers/Pages/Layout/Controllers/Layout%20Pages%20Controllers/Home/Controllers/home_controller.dart';
+import 'package:mekhemar/controllers/Theme/theme.dart';
 import '../../../../../../../controllers/Generated/Assets/assets.dart';
 import '../../../../../../components/Text/custom_text.dart';
 
@@ -19,8 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    widget.homeController.setState = setState;
-    widget.homeController.loadChatHistory();
+    widget.homeController.initState(setState);
   }
 
   @override
@@ -30,7 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: Builder(
           builder:
               (context) => IconButton(
-                icon: Image.asset(Assets.drawer, width: 24.w, height: 24.h),
+                icon: Image.asset(
+                  Assets.drawer,
+                  width: 24.w,
+                  height: 24.h,
+                  color: Theme.of(context).iconTheme.color, // ADAPT COLOR HERE
+                ),
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
         ),
@@ -43,7 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
         actions: [
           IconButton(
-            icon: SvgPicture.asset(Assets.create),
+            icon: SvgPicture.asset(
+              Assets.create,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).iconTheme.color!,
+                BlendMode.srcIn,
+              ), // ADAPT COLOR HERE
+            ),
             onPressed: widget.homeController.saveCurrentChatSession,
           ),
         ],
@@ -56,7 +68,9 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFFB39DDB)),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
               child: const Text(
                 'Chat History',
                 style: TextStyle(color: Colors.white, fontSize: 24),
@@ -89,6 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
         messageOptions: MessageOptions(
           showCurrentUserAvatar: true,
           containerColor: const Color(0xFFB39DDB), // LLaMA branding color
+          timeFormat: DateFormat(DateFormat.HOUR_MINUTE),
+          showTime: true,
+          currentUserTextColor: AppTheme.defaultTextColor(context),
           currentUserContainerColor: Theme.of(context).colorScheme.primary,
           textColor: Colors.black,
         ),
@@ -96,15 +113,64 @@ class _HomeScreenState extends State<HomeScreen> {
             widget.homeController.isTyping
                 ? [widget.homeController.grokChatUser]
                 : [],
+        messageListOptions: MessageListOptions(
+          dateSeparatorFormat: DateFormat(DateFormat.HOUR_MINUTE),
+          showDateSeparator: true,
+          separatorFrequency: SeparatorFrequency.hours,
+        ),
         // No typing indicator needed here
         messages: widget.homeController.messages,
         inputOptions: InputOptions(
-          leading: <Widget>[
+          inputDisabled: widget.homeController.isRecording,
+          leading: [
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.upload, size: 24),
+              onPressed:
+                  () => widget.homeController.toggleVoiceRecording(context),
+              icon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    widget.homeController.isRecording ? Icons.stop : Icons.mic,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  if (widget.homeController.isRecording)
+                    StreamBuilder(
+                      stream: Stream.periodic(Duration(seconds: 1)),
+                      builder: (context, snapshot) {
+                        final startTime =
+                            widget.homeController.recordingStartTime;
+                        if (startTime == null) return SizedBox.shrink();
+
+                        final duration = DateTime.now().difference(startTime);
+                        return Text('${duration.inSeconds}s');
+                      },
+                    ),
+                ],
+              ),
             ),
           ],
+          sendOnEnter: true,
+          sendButtonBuilder:
+              (send) => IconButton(
+                onPressed: send,
+                icon: Icon(
+                  Icons.send,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24.dg,
+                ),
+              ),
+          inputDecoration: InputDecoration(
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surface,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 12.h,
+            ),
+            hintText:
+                widget.homeController.isRecording
+                    ? 'Recording...'
+                    : 'Type your message...',
+          ).applyDefaults(Theme.of(context).inputDecorationTheme),
         ),
       ),
     );

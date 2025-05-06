@@ -51,5 +51,9 @@
     <string>We use Face ID to authenticate your identity for better security.</string>
     <key>NSBiometricUsageDescription</key>
     <string>We use biometric authentication (Face ID/Touch ID) to securely log you in.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need microphone access to record your voice messages</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>We need access to your speech recognition to convert your voice into text.</string>
 </dict>
 </plist>

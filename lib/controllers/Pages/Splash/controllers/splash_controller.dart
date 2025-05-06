@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mekhemar/controllers/Pages/Auth/services/auth_service.dart';
 import '../../../../views/components/Snack Bar/failed_snackbar.dart';
 import '../../../Features/Biometric/Controller/biometric_controller.dart';
 import '../../../Repos/local/secure_storage_helper.dart';
@@ -108,10 +109,12 @@ class SplashController {
       if (!context.mounted) return;
 
       context.go(AppPage.onboarding);
+    } else if (await AuthService.getRememberMe()) {
+      if (!context.mounted) return;
+      _attemptAutoLogin(context: context);
     } else {
       if (!context.mounted) return;
-
-      _attemptAutoLogin(context: context);
+      context.go(AppPage.login);
     }
   }
 }

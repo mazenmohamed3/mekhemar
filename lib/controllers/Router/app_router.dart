@@ -13,8 +13,10 @@ import '../../views/Pages/Sign Up/screens/signup_screen.dart';
 import 'app_page.dart';
 
 class AppRouter {
+
   static final GoRouter routerConfig = GoRouter(
     initialLocation: AppPage.splash,
+
     routes: [
       GoRoute(
         path: AppPage.splash,
@@ -49,12 +51,13 @@ class AppRouter {
         },
         branches: <StatefulShellBranch>[
           StatefulShellBranch(
+            preload: true,
             routes: <RouteBase>[
               GoRoute(
                 path: AppPage.profile,
                 builder:
                     (BuildContext context, GoRouterState state) =>
-                        ProfileScreen(),
+                        ProfileScreen(profileController: AppControllers.profileController,),
               ),
             ],
           ),

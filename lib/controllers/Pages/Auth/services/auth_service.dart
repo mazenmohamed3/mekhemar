@@ -1,8 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../Repos/local/secure_storage_helper.dart';
+import '../../Layout/Controllers/Layout Pages Controllers/Home/Services/chat_service.dart';
 
 class AuthService {
+  static const _rememberMeKey = 'rememberMe';
+  Map<String, ChatService> chatHistory = {};
+
   // FirebaseAuth error mapper
   String handleFirebaseAuthException(FirebaseAuthException e) {
     switch (e.code) {
@@ -67,6 +71,24 @@ class AuthService {
       return 'passwordsDoNotMatch'.tr();
     }
     return null;
+  }
+
+  static Future<void> setRememberMe(bool value) async {
+    await SecureStorageHelper.writeValueToKey(
+      key: _rememberMeKey,
+      value: value.toString(),
+    );
+  }
+
+  static Future<bool> getRememberMe() async {
+    final value = await SecureStorageHelper.readValueFromKey(
+      key: _rememberMeKey,
+    );
+    return value == 'true';
+  }
+
+  static Future<void> clearRememberMe() async {
+    await SecureStorageHelper.deleteValueFromKey(key: _rememberMeKey);
   }
 
   Future<void> saveLogin({

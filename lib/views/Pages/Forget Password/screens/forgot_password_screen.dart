@@ -62,8 +62,10 @@ class ForgetPasswordScreen extends StatelessWidget {
                             controller:
                                 forgetPasswordController.emailController,
                             keyboardType: TextInputType.emailAddress,
-                            onFieldSubmitted: forgetPasswordController.onFieldSubmitted,
+                            onFieldSubmitted:
+                                forgetPasswordController.onFieldSubmitted,
                             onTapOutside: forgetPasswordController.onTapOutside,
+                            onChanged: forgetPasswordController.onChanged,
                             label: "forgetPasswordLabel",
                             hintText: "forgetPasswordHint",
                             validator:
@@ -84,9 +86,8 @@ class ForgetPasswordScreen extends StatelessWidget {
                     return CustomButton(
                       text: 'forgetPasswordButtonLabel',
                       onPressed:
-                          () async => await forgetPasswordController.resetPassword(
-                        context: context,
-                      ),
+                          () async => await forgetPasswordController
+                              .resetPassword(context: context),
                       noAction: forgetPasswordController.noAction,
                       isLoading: forgetPasswordController.isLoading,
                     );

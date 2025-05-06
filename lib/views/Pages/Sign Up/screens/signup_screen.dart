@@ -63,6 +63,7 @@ class SignupScreen extends StatelessWidget {
                               onFieldSubmitted:
                                   signupController.onFieldSubmitted,
                               onTapOutside: signupController.onTapOutside,
+                              onChanged: signupController.onChanged,
                               label: "signUpUsernameLabel",
                               hintText: "signUpUsernameHint",
                               validator:
@@ -77,6 +78,7 @@ class SignupScreen extends StatelessWidget {
                               onFieldSubmitted:
                                   signupController.onFieldSubmitted,
                               onTapOutside: signupController.onTapOutside,
+                              onChanged: signupController.onChanged,
                               label: "signUpEmailLabel",
                               hintText: "signUpEmailHint",
                               validator:
@@ -91,6 +93,7 @@ class SignupScreen extends StatelessWidget {
                               onFieldSubmitted:
                                   signupController.onFieldSubmitted,
                               onTapOutside: signupController.onTapOutside,
+                              onChanged: signupController.onChanged,
                               label: "signUpPasswordLabel",
                               hintText: "signUpPasswordHint",
                               obscureText: true,
@@ -107,6 +110,7 @@ class SignupScreen extends StatelessWidget {
                               onFieldSubmitted:
                                   signupController.onFieldSubmitted,
                               onTapOutside: signupController.onTapOutside,
+                              onChanged: signupController.onChanged,
                               label: "signUpConfirmPasswordLabel",
                               hintText: "signUpConfirmPasswordHint",
                               obscureText: true,

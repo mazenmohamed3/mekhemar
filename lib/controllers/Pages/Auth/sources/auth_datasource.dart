@@ -7,6 +7,7 @@ import '../../../../models/user_model.dart';
 import '../../../../views/components/Dialog/stay_signed_in_dialog.dart';
 import '../../../Router/app_page.dart';
 import '../services/auth_service.dart';
+import '../services/chat_cleanup_service.dart';
 
 class AuthDatasource {
   AuthDatasource(AuthService loginService) : _loginService = loginService;
@@ -14,7 +15,7 @@ class AuthDatasource {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final AuthService _loginService;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  static UserCredential? userMessage;
+  UserCredential? userMessage;
 
   Future<FirebaseAuthResult> emailAndPasswordLogin({
     required String email,
@@ -23,6 +24,7 @@ class AuthDatasource {
     required BuildContext context,
   }) async {
     try {
+      await setRememberMe(rememberMe);
       // Sign in using email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -84,6 +86,7 @@ class AuthDatasource {
         );
 
         rememberMe = choice ?? false;
+        await setRememberMe(rememberMe);
       }
       final user = FirebaseAuthResult.fromUser(userCredential.user!);
 
@@ -119,7 +122,7 @@ class AuthDatasource {
       if (googleUser == null) throw 'googleSignInAborted';
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+          await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -139,6 +142,7 @@ class AuthDatasource {
         );
 
         rememberMe = choice ?? false;
+        await setRememberMe(rememberMe);
       }
       final user = FirebaseAuthResult.fromUser(userCredential.user!);
 
@@ -153,7 +157,6 @@ class AuthDatasource {
       } else if (showDialogPrompt) {
         await _loginService.clearSavedLogin();
       }
-
       // Returning a custom result model (FirebaseAuthResult)
       return user;
     } on FirebaseAuthException catch (e) {
@@ -184,12 +187,33 @@ class AuthDatasource {
     return await _loginService.loadSavedLogin();
   }
 
+  Future<void> setRememberMe(bool rememberMe) async {
+    await AuthService.setRememberMe(rememberMe);
+  }
+
+  Future<bool> getRememberMe() async {
+    return await AuthService.getRememberMe();
+  }
+
   void logout(BuildContext context) async {
+    final userId = userMessage?.user?.uid;
+    await setRememberMe(false);
+
+    // Sign out from auth services
     await _auth.signOut();
     await _googleSignIn.signOut();
+
+    // Clear chat-related data using a dedicated service
+    if (userId != null) {
+      await ChatCleanupService.clearChatDataForUser(userId);
+    }
+
+    // Clear in-memory user and login state
     userMessage = null;
     await _loginService.clearSavedLogin();
+
+    // Navigate to login screen
     if (!context.mounted) return;
-    context.go(AppPage.login);
+    context.pushReplacement(AppPage.login);
   }
 }

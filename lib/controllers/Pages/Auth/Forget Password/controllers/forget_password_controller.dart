@@ -44,6 +44,22 @@ class ForgetPasswordController {
     }
   }
 
+  void onChanged(String value) {
+    // Validate email
+    final isEmailValid = emailValidator(emailController.text) == null;
+
+    // Check if email is valid and the button is not loading
+    if (isEmailValid && !isLoading) {
+      setButtonState(() {
+        noAction = false; // Enable the reset password button
+      });
+    } else {
+      setButtonState(() {
+        noAction = true; // Disable the reset password button
+      });
+    }
+  }
+
   void onTapOutside() {
     if (emailController.text.isNotEmpty && formKey.currentState!.validate()) {
       toggleNoAction(value: false);
