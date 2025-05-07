@@ -287,7 +287,6 @@ class HomeController {
       }
 
       await saveCurrentChatSession(clearMessages: false);
-
     } catch (e) {
       print('Error during chat response: $e');
     } finally {
@@ -456,10 +455,11 @@ class HomeController {
     final String? localData = await SecureStorageHelper.readValueFromKey(
       key: 'chatHistory_$userId',
     );
-    final DocumentSnapshot firestoreDoc = await FirebaseFirestore.instance
-        .collection('chat_histories')
-        .doc(userId)
-        .get();
+    final DocumentSnapshot firestoreDoc =
+        await FirebaseFirestore.instance
+            .collection('chat_histories')
+            .doc(userId)
+            .get();
 
     // Parse data
     List<ChatMessage> localMessages = [];
@@ -468,10 +468,11 @@ class HomeController {
     if (localData != null) {
       try {
         final List<dynamic> jsonList = jsonDecode(localData);
-        localMessages = jsonList
-            .map((json) => ChatService.fromJson(json))
-            .expand((service) => service.messages)
-            .toList();
+        localMessages =
+            jsonList
+                .map((json) => ChatService.fromJson(json))
+                .expand((service) => service.messages)
+                .toList();
       } catch (e) {
         print('Error parsing local messages: $e');
       }
@@ -479,18 +480,26 @@ class HomeController {
 
     if (firestoreDoc.exists) {
       try {
-        final data = (firestoreDoc.data() as Map<String, dynamic>?)?['data'] as List<dynamic>? ?? [];
-        firestoreMessages = data
-            .map((entry) => ChatService.fromJson(entry as Map<String, dynamic>))
-            .expand((service) => service.messages)
-            .toList();
+        final data =
+            (firestoreDoc.data() as Map<String, dynamic>?)?['data']
+                as List<dynamic>? ??
+            [];
+        firestoreMessages =
+            data
+                .map(
+                  (entry) =>
+                      ChatService.fromJson(entry as Map<String, dynamic>),
+                )
+                .expand((service) => service.messages)
+                .toList();
       } catch (e) {
         print('Error parsing Firestore messages: $e');
       }
     }
 
     // Compare messages
-    final bool needUpdate = !_areMessagesEqual(localMessages, firestoreMessages);
+    final bool needUpdate =
+        !_areMessagesEqual(localMessages, firestoreMessages);
 
     if (needUpdate) {
       if (firestoreMessages.isEmpty && localMessages.isNotEmpty) {
@@ -521,9 +530,9 @@ class HomeController {
         .collection('chat_histories')
         .doc(userId)
         .set({
-      'data': messages.map((m) => m.toJson()).toList(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+          'data': messages.map((m) => m.toJson()).toList(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
   }
 
   bool _areMessagesEqual(List<ChatMessage> a, List<ChatMessage> b) {
