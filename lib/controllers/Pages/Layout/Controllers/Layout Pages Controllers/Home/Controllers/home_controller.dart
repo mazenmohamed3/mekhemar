@@ -134,6 +134,8 @@ class HomeController {
 
   // == CHAT & HISTORY LOGIC ==
   Future<void> loadChatHistory() async {
+    await _syncChatSources(); // Add this line first
+
     final userId = FirebaseAuth.instance.currentUser!.uid;
     String? jsonString = await SecureStorageHelper.readValueFromKey(
       key: 'chatHistory_$userId',
@@ -284,9 +286,8 @@ class HomeController {
         }
       }
 
-      if (_currentSessionId == null) {
-        await saveCurrentChatSession(clearMessages: false);
-      }
+      await saveCurrentChatSession(clearMessages: false);
+
     } catch (e) {
       print('Error during chat response: $e');
     } finally {
@@ -414,8 +415,7 @@ class HomeController {
     });
 
     // First persist to local storage
-    //await _persistChatHistory();
-    await _deleteSessionFromSecureStorage(userId, sessionId);
+    await _persistChatHistory();
 
     try {
       final docRef = FirebaseFirestore.instance
@@ -449,34 +449,81 @@ class HomeController {
     }
   }
 
-  Future<void> _deleteSessionFromSecureStorage(
-    String userId,
-    String sessionId,
-  ) async {
-    try {
-      // Retrieve the current chat history from secure storage
-      String? storedChatHistory = await SecureStorageHelper.readValueFromKey(
-        key: "chatHistory_$userId",
-      );
+  Future<void> _syncChatSources() async {
+    final userId = user!.uid;
 
-      if (storedChatHistory != null) {
-        // Decode the stored chat history (assuming it's a JSON list of sessions)
-        List<dynamic> chatHistoryList = List.from(
-          jsonDecode(storedChatHistory),
-        );
+    // Get both data sources
+    final String? localData = await SecureStorageHelper.readValueFromKey(
+      key: 'chatHistory_$userId',
+    );
+    final DocumentSnapshot firestoreDoc = await FirebaseFirestore.instance
+        .collection('chat_histories')
+        .doc(userId)
+        .get();
 
-        // Remove the session with the matching sessionId
-        chatHistoryList.removeWhere((session) => session['id'] == sessionId);
+    // Parse data
+    List<ChatMessage> localMessages = [];
+    List<ChatMessage> firestoreMessages = [];
 
-        // Store the updated chat history back to secure storage
-        await SecureStorageHelper.writeValueToKey(
-          key: "chatHistory_$userId",
-          value: jsonEncode(chatHistoryList),
-        );
+    if (localData != null) {
+      try {
+        final List<dynamic> jsonList = jsonDecode(localData);
+        localMessages = jsonList
+            .map((json) => ChatService.fromJson(json))
+            .expand((service) => service.messages)
+            .toList();
+      } catch (e) {
+        print('Error parsing local messages: $e');
       }
-    } catch (e) {
-      print("Error deleting session from secure storage: $e");
     }
+
+    if (firestoreDoc.exists) {
+      try {
+        final data = (firestoreDoc.data() as Map<String, dynamic>?)?['data'] as List<dynamic>? ?? [];
+        firestoreMessages = data
+            .map((entry) => ChatService.fromJson(entry as Map<String, dynamic>))
+            .expand((service) => service.messages)
+            .toList();
+      } catch (e) {
+        print('Error parsing Firestore messages: $e');
+      }
+    }
+
+    // Compare messages
+    final bool needUpdate = !_areMessagesEqual(localMessages, firestoreMessages);
+
+    if (needUpdate) {
+      if (firestoreMessages.isEmpty && localMessages.isNotEmpty) {
+        // Update Firestore from local storage
+        await _updateFirestoreFromLocal(localMessages);
+      } else if (localMessages.isEmpty && firestoreMessages.isNotEmpty) {
+        // Update local storage from Firestore
+        await _updateLocalFromFirestore(firestoreMessages);
+      } else {
+        // Both have data - compare timestamps (add modifiedAt field to your model)
+        // This example assumes Firestore is source of truth
+        await _updateLocalFromFirestore(firestoreMessages);
+      }
+    }
+  }
+
+  Future<void> _updateLocalFromFirestore(List<ChatMessage> messages) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    await SecureStorageHelper.writeValueToKey(
+      key: 'chatHistory_$userId',
+      value: jsonEncode(messages),
+    );
+  }
+
+  Future<void> _updateFirestoreFromLocal(List<ChatMessage> messages) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance
+        .collection('chat_histories')
+        .doc(userId)
+        .set({
+      'data': messages.map((m) => m.toJson()).toList(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 
   bool _areMessagesEqual(List<ChatMessage> a, List<ChatMessage> b) {
@@ -493,17 +540,17 @@ class HomeController {
     final userId = user!.uid;
     final jsonList = chatHistory.values.map((s) => s.toJson()).toList();
 
+    await SecureStorageHelper.writeValueToKey(
+      key: "chatHistory_$userId",
+      value: jsonEncode(jsonList),
+    );
+
     try {
       final firestore = FirebaseFirestore.instance;
-      await firestore.collection('chat_histories').doc(userId).set({
+      await firestore.collection('chat_histories').doc(userId).update({
         'data': jsonList,
         'updatedAt': FieldValue.serverTimestamp(),
       });
-
-      await SecureStorageHelper.writeValueToKey(
-        key: "chatHistory_$userId",
-        value: jsonEncode(jsonList),
-      );
     } catch (e) {
       print('Error saving chat history to Firestore: $e');
     }
