@@ -76,7 +76,6 @@ class _UsernameInputDialogState extends State<UsernameInputDialog> {
           children: [
             Expanded(
               child: CustomButton(
-                focusNode: buttonNode,
                 text: 'usernameDialogCancel',
                 onPressed: () => context.pop(null),
                 color: Theme.of(context).colorScheme.errorContainer,
@@ -85,6 +84,7 @@ class _UsernameInputDialogState extends State<UsernameInputDialog> {
             SizedBox(width: 8.w),
             Expanded(
               child: CustomButton(
+                focusNode: buttonNode,
                 text: 'usernameDialogSave',
                 onPressed: () => context.pop(controller.text.trim()),
               ),

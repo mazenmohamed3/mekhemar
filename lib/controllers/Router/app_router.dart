@@ -33,9 +33,7 @@ class AppRouter {
       ),
       GoRoute(
         path: AppPage.login,
-        builder:
-            (context, state) =>
-                LoginScreen(loginController: AppControllers.loginController),
+        builder: (context, state) => LoginScreen(loginController: AppControllers.loginController),
       ),
       StatefulShellRoute.indexedStack(
         builder: (

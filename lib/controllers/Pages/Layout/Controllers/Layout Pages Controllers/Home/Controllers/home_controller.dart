@@ -264,7 +264,7 @@ class HomeController {
 
         final transcribedText = voiceService.wordsSpoken.trim();
         if (transcribedText.isEmpty || voiceService.confidence < 0.4) {
-          throw Exception('Could not understand speech clearly.');
+          throw 'Could not understand speech clearly.';
         }
 
         await getChatResponse(

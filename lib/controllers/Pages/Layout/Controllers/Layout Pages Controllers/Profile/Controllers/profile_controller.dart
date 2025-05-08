@@ -116,7 +116,7 @@ class ProfileController {
   }
 
   void Function()? onPhoneTap(BuildContext context) {
-    if (phone == 'Press to Add Phone') {
+    if (phone == 'noPhone'.tr()) {
       return () async {
         final newPhone = await showDialog<String>(
           context: context,

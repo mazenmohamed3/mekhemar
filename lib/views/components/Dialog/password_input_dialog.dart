@@ -16,6 +16,7 @@ class PasswordInputDialog extends StatefulWidget {
 class _PasswordInputDialogState extends State<PasswordInputDialog> {
   final TextEditingController controller = TextEditingController();
   final FocusNode node = FocusNode();
+  final FocusNode buttonNode = FocusNode();
 
   @override
   void dispose() {
@@ -52,6 +53,11 @@ class _PasswordInputDialogState extends State<PasswordInputDialog> {
             controller: controller,
             focus: node,
             onTapOutside: () => node.unfocus(),
+            onFieldSubmitted: (_) {
+              buttonNode
+                ..canRequestFocus = true
+                ..requestFocus();
+            },
             obscureText: true,
             hintText: "passwordDialogHint",
             prefixIcon: const Icon(Icons.lock),
@@ -80,6 +86,7 @@ class _PasswordInputDialogState extends State<PasswordInputDialog> {
             SizedBox(width: 8.w),
             Expanded(
               child: CustomButton(
+                focusNode: buttonNode,
                 text: 'passwordDialogSave',
                 onPressed: () => context.pop(controller.text.trim()),
               ),
