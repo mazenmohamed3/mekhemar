@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mekhemar/controllers/Pages/Auth/services/auth_service.dart';
 import '../../../../models/Auth/input/user_model.dart';
 import '../../../../views/components/Snack Bar/failed_snackbar.dart';
 import '../../../Features/Biometric/Controller/biometric_controller.dart';
 import '../../../Repos/local/secure_storage_helper.dart';
 import '../../../Router/app_page.dart';
+import '../../Auth/services/auth_service.dart';
 import '../../Auth/sources/auth_datasource.dart';
 
 class SplashController {
@@ -104,11 +104,6 @@ class SplashController {
     );
 
     if (isFirstTime == null) {
-      await SecureStorageHelper.writeValueToKey(
-        key: 'isFirstTime',
-        value: 'false',
-      );
-
       if (!context.mounted) return;
       context.go(AppPage.onboarding);
     } else if (await AuthService.getRememberMe()) {

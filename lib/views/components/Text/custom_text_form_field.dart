@@ -48,7 +48,11 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       controller: widget.controller,
       focusNode: widget.focus,
       autovalidateMode: AutovalidateMode.onUnfocus,
-      onChanged: (value) => widget.onChanged!(value),
+      onChanged: (value) {
+        if (widget.onChanged != null){
+          widget.onChanged!(value);
+        }
+      },
       keyboardType: widget.keyboardType,
       onFieldSubmitted: (value) => widget.onFieldSubmitted!(value),
       onTapOutside: (event) {

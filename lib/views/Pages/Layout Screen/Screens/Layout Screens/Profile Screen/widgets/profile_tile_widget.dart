@@ -32,13 +32,13 @@ class ProfileTileWidget extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       child: Row(
-        mainAxisSize: MainAxisSize.max, // Let the row take all available space
+        mainAxisSize: MainAxisSize.max,
         children: [
           Image.asset(
             asset,
             width: iconWidth,
             height: iconHeight,
-            color: iconColor ?? Theme.of(context).iconTheme.color!,
+            color: iconColor ?? Theme.of(context).colorScheme.primary,
           ),
           SizedBox(width: 16.w), // Adds spacing between icon and text
           Expanded(
@@ -50,7 +50,7 @@ class ProfileTileWidget extends StatelessWidget {
                 CustomText(
                   text: title,
                   fontWeight: FontWeight.w700,
-                  color: titleColor,
+                  color: titleColor ?? Theme.of(context).colorScheme.primary,
                   fontSize: 24.sp,
                   overflow: TextOverflow.ellipsis, // Handle overflow
                 ),

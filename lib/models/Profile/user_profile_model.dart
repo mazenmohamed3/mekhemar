@@ -41,7 +41,7 @@ class UserProfileModel {
     );
   }
 
-  // Method to convert model to a map for Firestore
+  // Convert model to a map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'displayName': displayName,
@@ -50,6 +50,11 @@ class UserProfileModel {
       'phoneNumber': phoneNumber,
       'location': location,
     };
+  }
+
+  // Update display name
+  void updateDisplayName(String name) {
+    displayName = name;
   }
 
   // Update phone number

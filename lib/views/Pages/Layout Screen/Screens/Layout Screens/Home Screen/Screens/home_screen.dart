@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mekhemar/controllers/Pages/Layout/Controllers/Layout%20Pages%20Controllers/Home/Controllers/home_controller.dart';
-import 'package:mekhemar/controllers/Theme/theme.dart';
 import '../../../../../../../controllers/Generated/Assets/assets.dart';
+import '../../../../../../../controllers/Pages/Layout/Controllers/Layout Pages Controllers/Home/Controllers/home_controller.dart';
+import '../../../../../../../controllers/Theme/Theme Data/theme.dart';
 import '../../../../../../components/Text/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {

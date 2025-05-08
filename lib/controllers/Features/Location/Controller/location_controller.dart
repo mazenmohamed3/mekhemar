@@ -8,10 +8,10 @@ class LocationController {
 
   // Function to fetch the current location and return it as a formatted string
   Future<String> getCurrentLocation() async {
-    // Check if location services are enabled
+    // Check if location Services are enabled
     bool controllerEnabled = await Geolocator.isLocationServiceEnabled();
     if (!controllerEnabled) {
-      // return "Location services are disabled";
+      // return "Location Services are disabled";
     }
 
     // Request location permissions

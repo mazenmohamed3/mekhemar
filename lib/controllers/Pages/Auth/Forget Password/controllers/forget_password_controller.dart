@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mekhemar/models/Auth/input/user_model.dart';
+import '../../../../../models/Auth/input/user_model.dart';
 import '../../../../../views/components/Dialog/reset_password_success_dialog.dart';
 import '../../../../Router/app_page.dart';
 import '../../services/auth_service.dart';
@@ -90,7 +90,9 @@ class ForgetPasswordController {
     if (formKey.currentState!.validate()) {
       try {
         toggleIsLoading(value: true);
-        await authDataSource.resetPassword(user: UserModel(email: emailController.text));
+        await authDataSource.resetPassword(
+          user: UserModel(email: emailController.text),
+        );
 
         if (!context.mounted) return;
 

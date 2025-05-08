@@ -5,15 +5,15 @@ import 'dart:async';
 /// A simple notification system for broadcasting profile updates across the app.
 ///
 /// This class follows the Singleton pattern to ensure a single instance is used app-wide.
-class ProfileUpdateNotifier {
+class ProfileUpdateService {
   // Singleton instance
-  static final ProfileUpdateNotifier _instance = ProfileUpdateNotifier._internal();
+  static final ProfileUpdateService _instance = ProfileUpdateService._internal();
 
   // Factory constructor to return the singleton instance
-  factory ProfileUpdateNotifier() => _instance;
+  factory ProfileUpdateService() => _instance;
 
   // Private constructor for singleton
-  ProfileUpdateNotifier._internal();
+  ProfileUpdateService._internal();
 
   // StreamController for profile updates
   final _profileUpdateController = StreamController<ProfileUpdateEvent>.broadcast();

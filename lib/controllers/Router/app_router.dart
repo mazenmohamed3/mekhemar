@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mekhemar/controllers/Router/app_controllers.dart';
 import '../../views/Pages/Layout Screen/Screens/Layout Screens/Home Screen/Screens/home_screen.dart';
 import '../../views/Pages/Layout Screen/Screens/Layout Screens/Profile Screen/Screens/profile_screen.dart';
 import '../../views/Pages/Layout Screen/Screens/Layout Screens/Settings Screen/Screens/settings_screen.dart';
@@ -10,6 +9,7 @@ import '../../views/Pages/onboarding/screens/onboarding_screen.dart';
 import '../../views/Pages/Forget Password/screens/forgot_password_screen.dart';
 import '../../views/Pages/Login/screens/login_screen.dart';
 import '../../views/Pages/Sign Up/screens/signup_screen.dart';
+import 'app_controllers.dart';
 import 'app_page.dart';
 
 class AppRouter {
@@ -76,7 +76,7 @@ class AppRouter {
                 path: AppPage.settings,
                 builder:
                     (BuildContext context, GoRouterState state) =>
-                        SettingsScreen(),
+                        SettingsScreen(settingsController: AppControllers.settingsController),
               ),
             ],
           ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mekhemar/views/Pages/Layout%20Screen/Screens/Layout%20Screens/Profile%20Screen/widgets/profile_image_widget.dart';
-import 'package:mekhemar/views/components/Text/custom_text.dart';
 import '../../../../../../../controllers/Generated/Assets/assets.dart';
 import '../../../../../../../controllers/Pages/Layout/Controllers/Layout Pages Controllers/Profile/Controllers/profile_controller.dart';
+import '../../../../../../components/Text/custom_text.dart';
+import '../widgets/profile_image_widget.dart';
 import '../widgets/profile_tile_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(),
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 32.w),
+          padding: EdgeInsets.all(32.sp),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -46,12 +46,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               SizedBox(height: 32.h),
-              CustomText(
-                text: widget.profileController.displayName!,
-                textAlign: TextAlign.center,
-                fontWeight: FontWeight.w700,
-                fontSize: 32.sp,
-                overflow: TextOverflow.ellipsis,
+              StatefulBuilder(
+                builder: (context, setDisplayNameState) {
+                  widget.profileController.setDisplayNameState = setDisplayNameState;
+                  return CustomText(
+                    text: widget.profileController.displayName!,
+                    textAlign: TextAlign.center,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 32.sp,
+                    overflow: TextOverflow.ellipsis,
+                  );
+                },
               ),
               SizedBox(height: 64.h),
               ProfileTileWidget(

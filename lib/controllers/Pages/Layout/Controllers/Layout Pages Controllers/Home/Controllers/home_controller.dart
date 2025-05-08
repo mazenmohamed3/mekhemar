@@ -11,14 +11,15 @@ import 'package:groq_sdk/models/groq.dart';
 import 'package:groq_sdk/models/groq_chat.dart';
 import 'package:groq_sdk/models/groq_llm_model.dart';
 import 'package:groq_sdk/models/groq_message.dart';
-import 'package:mekhemar/views/components/Snack%20Bar/failed_snackbar.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../../../../models/Home/chat_model.dart';
 import '../../../../../../../models/Home/home_model.dart';
+import '../../../../../../../views/components/Snack Bar/failed_snackbar.dart';
 import '../../../../../../Generated/Assets/assets.dart';
 import '../../../../../../Repos/local/secure_storage_helper.dart';
 import '../../Profile/services/profile_update_service.dart';
+import '../../Settings/Services/settings_update_service.dart';
 import '../Services/voice_service.dart';
 
 class HomeController {
@@ -35,8 +36,16 @@ class HomeController {
     );
 
     // Subscribe to profile updates
-    _profileNotifier = ProfileUpdateNotifier();
-    _profileSubscription = _profileNotifier.profileUpdates.listen(_handleProfileUpdate);
+    _profileNotifierService = ProfileUpdateService();
+    _profileSubscription = _profileNotifierService.profileUpdates.listen(
+      _handleProfileUpdate,
+    );
+
+    // Subscribe to settings updates
+    _settingsNotifierService = SettingsUpdateService();
+    _settingsSubscription = _settingsNotifierService.settingsUpdates.listen(
+      _handleSettingsUpdate,
+    );
   }
 
   // == STATE AND CONTROLLERS ==
@@ -50,9 +59,17 @@ class HomeController {
   VoiceService voiceService;
   User? user;
 
+  // Settings
+  double _temperature = 0.5;
+  String _selectedModel = GroqModels.llama3_70b;
+
   // Profile notification system
-  late final ProfileUpdateNotifier _profileNotifier;
+  late final ProfileUpdateService _profileNotifierService;
   late final StreamSubscription _profileSubscription;
+
+  // Settings notification system
+  late final SettingsUpdateService _settingsNotifierService;
+  late final StreamSubscription _settingsSubscription;
 
   // == GETTERS AND SETTERS FOR MODEL DATA ==
   List<ChatMessage> get messages => _model.messages;
@@ -69,6 +86,10 @@ class HomeController {
 
   ChatUser get currentUser => _model.currentUser!;
 
+  double get temperature => _temperature;
+
+  String get selectedModel => _selectedModel;
+
   set isRecording(bool value) {
     voiceService.isRecording = value;
     _model.setRecording(value);
@@ -79,7 +100,6 @@ class HomeController {
     this.setState = setState;
     user = FirebaseAuth.instance.currentUser;
     _model = HomeModel();
-
     // Initialize current user in model
     _model.currentUser = ChatUser(
       id: "69420",
@@ -128,6 +148,29 @@ class HomeController {
     }
   }
 
+  // Handle settings updates
+  void _handleSettingsUpdate(SettingsUpdateEvent event) async {
+    final settings = event.settings;
+
+    if (event.updateType case SettingsUpdateType.temperature) {
+      _temperature = settings.temperature;
+      if (_currentChatSession != null && currentSessionId != null) {
+        await loadChatSession(chatHistory[currentSessionId]!);
+      }
+    } else if (event.updateType case SettingsUpdateType.model) {
+      _selectedModel = settings.selectedModel;
+      if (_currentChatSession != null && currentSessionId != null) {
+        await loadChatSession(chatHistory[currentSessionId]!);
+      }
+    } else if (event.updateType case SettingsUpdateType.all) {
+      _temperature = settings.temperature;
+      _selectedModel = settings.selectedModel;
+      if (_currentChatSession != null && currentSessionId != null) {
+        await loadChatSession(chatHistory[currentSessionId]!);
+      }
+    }
+  }
+
   // Update user profile in all chat messages
   void _updateUserInChatHistory(String newPhotoUrl) {
     setState(() {
@@ -150,21 +193,22 @@ class HomeController {
 
       // Update all chat history sessions
       chatHistory.forEach((sessionId, chatModel) {
-        final updatedMessages = chatModel.messages.map((message) {
-          if (message.user.id == currentUser.id) {
-            return ChatMessage(
-              user: ChatUser(
-                id: message.user.id,
-                firstName: message.user.firstName,
-                lastName: message.user.lastName,
-                profileImage: newPhotoUrl,
-              ),
-              createdAt: message.createdAt,
-              text: message.text,
-            );
-          }
-          return message;
-        }).toList();
+        final updatedMessages =
+            chatModel.messages.map((message) {
+              if (message.user.id == currentUser.id) {
+                return ChatMessage(
+                  user: ChatUser(
+                    id: message.user.id,
+                    firstName: message.user.firstName,
+                    lastName: message.user.lastName,
+                    profileImage: newPhotoUrl,
+                  ),
+                  createdAt: message.createdAt,
+                  text: message.text,
+                );
+              }
+              return message;
+            }).toList();
 
         _model.updateChatService(
           ChatModel(
@@ -181,9 +225,13 @@ class HomeController {
   }
 
   void _initializeNewChatSession() {
+    print("====================> model is: $selectedModel");
     _currentChatSession = _groq.startNewChat(
-      GroqModels.llama3_70b,
-      settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
+      _selectedModel, // Use the selected model from settings
+      settings: GroqChatSettings(
+        temperature: _temperature,
+        maxTokens: 512,
+      ), // Use temperature from settings
     );
 
     // Send system prompt
@@ -247,20 +295,22 @@ class HomeController {
     // If the data is not found in secure storage, fetch it from Firestore
     if (jsonString == null) {
       try {
-        final doc = await FirebaseFirestore.instance
-            .collection('chat_histories')
-            .doc(userId)
-            .get();
+        final doc =
+            await FirebaseFirestore.instance
+                .collection('chat_histories')
+                .doc(userId)
+                .get();
 
         if (doc.exists && doc.data()?['data'] != null) {
           final dataField = doc.data()?['data'];
 
           if (dataField is List) {
             // Convert Firestore data to ChatService objects
-            List<ChatModel> services = dataField.map((entry) {
-              final map = Map<String, dynamic>.from(entry);
-              return ChatModel.fromJson(map);
-            }).toList();
+            List<ChatModel> services =
+                dataField.map((entry) {
+                  final map = Map<String, dynamic>.from(entry);
+                  return ChatModel.fromJson(map);
+                }).toList();
 
             // Optionally, map to a chatHistory map for easy access later
             Map<String, ChatModel> historyCopy = {
@@ -340,7 +390,7 @@ class HomeController {
 
     // Reverse the order of messages when displaying them, if necessary
     _model.messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    setState(() {});  // Trigger a rebuild to update the UI
+    setState(() {}); // Trigger a rebuild to update the UI
   }
 
   Future<void> getChatResponse({
@@ -410,7 +460,7 @@ class HomeController {
     }
 
     if (shouldGenerateTitle) {
-      final chatSession = _groq.startNewChat(GroqModels.llama3_70b);
+      final chatSession = _groq.startNewChat(_selectedModel);
       final message = "initialPrompt".tr();
       chatSession.sendMessage(message, role: GroqMessageRole.system);
       final systemPrompt =
@@ -574,5 +624,6 @@ class HomeController {
   // Clean up resources
   void dispose() {
     _profileSubscription.cancel();
+    _settingsSubscription.cancel();
   }
 }

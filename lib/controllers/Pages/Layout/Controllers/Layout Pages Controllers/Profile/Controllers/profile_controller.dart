@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -6,16 +7,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mekhemar/controllers/Features/Location/Controller/location_controller.dart';
-import 'package:mekhemar/controllers/Pages/Auth/sources/auth_datasource.dart';
-import 'package:mekhemar/views/components/Snack%20Bar/success_snackbar.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../../../../models/Profile/user_profile_model.dart';
 import '../../../../../../../views/components/Dialog/phone_number_input_dialog.dart';
 import '../../../../../../../views/components/Dialog/select_image_dialog.dart';
 import '../../../../../../../views/components/Snack Bar/failed_snackbar.dart';
+import '../../../../../../../views/components/Snack Bar/success_snackbar.dart';
 import '../../../../../../Features/Cloud Image/Controller/cloudinary_controller.dart';
+import '../../../../../../Features/Location/Controller/location_controller.dart';
+import '../../../../../Auth/sources/auth_datasource.dart';
+import '../../Settings/Services/settings_update_service.dart';
 import '../services/profile_update_service.dart';
 
 class ProfileController {
@@ -26,22 +28,28 @@ class ProfileController {
   }) : _authDatasource = authDatasource,
        _locationController = locationController,
        _cloudinaryController = cloudinaryController,
-       _profileNotifier = ProfileUpdateNotifier(); // Initialize the notifier
+       _profileNotifierService = ProfileUpdateService(),
+       _settingsNotifierService =
+           SettingsUpdateService(); // <-- initialize service
 
   final AuthDatasource _authDatasource;
   final LocationController _locationController;
   final CloudinaryController _cloudinaryController;
-  final ProfileUpdateNotifier _profileNotifier; // Add the notifier
+  final ProfileUpdateService _profileNotifierService;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final SettingsUpdateService _settingsNotifierService;
+
+  late StreamSubscription<SettingsUpdateEvent> _settingsSubscription;
+
   late void Function(void Function()) setProfileState;
   late void Function(void Function()) setPhoneState;
   late void Function(void Function()) setLocationState;
+  late void Function(void Function()) setDisplayNameState;
 
   User? _user;
-  UserProfileModel? _userProfile; // New user profile model
+  UserProfileModel? _userProfile;
 
-  // Getters for profile data
   String? get displayName => _userProfile?.displayName;
 
   String? get photoUrl => _userProfile?.photoUrl;
@@ -56,10 +64,8 @@ class ProfileController {
     _user = _auth.currentUser;
 
     if (_user != null) {
-      // Initialize the model with user data
       _userProfile = UserProfileModel.fromUser(_user!);
 
-      // Fetch phone number from Firestore
       final phoneNumber = await _getPhoneNumberFromFirestore();
       if (phoneNumber != null) {
         setPhoneState(() {
@@ -67,10 +73,34 @@ class ProfileController {
         });
       }
 
-      // Get location
       final currentLocation = await _locationController.getCurrentLocation();
       setLocationState(() {
         _userProfile!.updateLocation(currentLocation);
+      });
+    }
+
+    // Start listening to username updates
+    _settingsSubscription = _settingsNotifierService.settingsUpdates.listen(
+      _handleSettingsUpdate,
+    );
+  }
+
+  void _handleSettingsUpdate(SettingsUpdateEvent event) async {
+    if (event.updateType == SettingsUpdateType.username ||
+        event.updateType == SettingsUpdateType.all) {
+      await _refreshDisplayName();
+    }
+  }
+
+  Future<void> _refreshDisplayName() async {
+    await _user?.reload();
+    _user = FirebaseAuth.instance.currentUser;
+    final newName = _user?.displayName;
+
+    print('New Display Name: $newName');
+    if (newName != null && newName.isNotEmpty) {
+      setDisplayNameState(() {
+        _userProfile?.updateDisplayName(newName);
       });
     }
   }
@@ -88,7 +118,6 @@ class ProfileController {
   void Function()? onPhoneTap(BuildContext context) {
     if (phone == 'Press to Add Phone') {
       return () async {
-        // Step 1: Enter Phone Number
         final newPhone = await showDialog<String>(
           context: context,
           builder: (context) => PhoneNumberInputDialog(),
@@ -97,7 +126,6 @@ class ProfileController {
         if (newPhone != null && newPhone.isNotEmpty) {
           if (!context.mounted) return;
 
-          // Step 2: Save phone number to Firestore
           await updatePhoneNumberInFirestore(
             context: context,
             phoneNumber: newPhone,
@@ -153,11 +181,9 @@ class ProfileController {
         await _user!.reload();
         _user = FirebaseAuth.instance.currentUser;
 
-        // Update the model
         _userProfile!.updatePhotoUrl(newPhotoUrl);
 
-        // Notify other parts of the app about the profile photo update
-        _profileNotifier.notifyProfileUpdate(
+        _profileNotifierService.notifyProfileUpdate(
           ProfileUpdateEvent(userId: _user!.uid, photoUrl: newPhotoUrl),
         );
 
@@ -177,28 +203,21 @@ class ProfileController {
     }
   }
 
-  /// ---- PHONE NUMBER FLOW ----
-
   Future<void> updatePhoneNumberInFirestore({
     required BuildContext context,
     required String phoneNumber,
   }) async {
     try {
-      // Save phone number to Firestore
-      await _firestore.collection('users').doc(_user!.uid).set(
-        {'phoneNumber': phoneNumber},
-        SetOptions(merge: true),
-      ); // Added merge option to not overwrite other fields
+      await _firestore.collection('users').doc(_user!.uid).set({
+        'phoneNumber': phoneNumber,
+      }, SetOptions(merge: true));
 
-      // Update the model
       _userProfile!.updatePhoneNumber(phoneNumber);
 
-      // Notify other parts of the app about the phone number update
-      _profileNotifier.notifyProfileUpdate(
+      _profileNotifierService.notifyProfileUpdate(
         ProfileUpdateEvent(userId: _user!.uid, phoneNumber: phoneNumber),
       );
 
-      // If update is successful
       if (context.mounted) {
         showSuccessSnackBar(context, title: 'phoneNumberUpdated');
         setPhoneState(() {});
@@ -214,7 +233,6 @@ class ProfileController {
     }
   }
 
-  // Fetch the phone number from Firestore
   Future<String?> _getPhoneNumberFromFirestore() async {
     try {
       final docSnapshot =
@@ -230,5 +248,9 @@ class ProfileController {
 
   void logout(BuildContext context) {
     _authDatasource.logout(context);
+  }
+
+  void dispose() {
+    _settingsSubscription.cancel();
   }
 }

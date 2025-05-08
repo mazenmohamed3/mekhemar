@@ -110,5 +110,38 @@
   "home": "الرئيسية",
   "settings": "الإعدادات",
 
-  "initialPrompt": "اسمك هو ميخمار بنها، وقد تم تصميمك بواسطة فريق مازن ليتم تقديمك إلى الدكتورة لمياء."
+  "initialPrompt": "اسمك هو ميخمار بنها، وقد تم تصميمك بواسطة فريق مازن ليتم تقديمك إلى الدكتورة لمياء.",
+
+  "changePassword": "تغيير كلمة المرور",
+  "enterNewPassword": "أدخل كلمة المرور الجديدة أدناه.",
+  "passwordDialogLabel": "كلمة المرور",
+  "passwordDialogHint": "••••••••",
+  "passwordEmpty": "لا يمكن ترك كلمة المرور فارغة.",
+  "passwordDialogTooShort": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
+  "passwordDialogCancel": "إلغاء",
+  "passwordDialogSave": "حفظ",
+  "passwordUpdatedSuccess": "تم تحديث كلمة المرور بنجاح!",
+
+  "enterUsername": "أدخل اسم المستخدم",
+  "enterNewUsername": "يرجى إدخال اسم مستخدم جديد.",
+  "usernameLabel": "اسم المستخدم",
+  "usernameHint": "مثال: johndoe",
+  "usernameEmpty": "لا يمكن ترك اسم المستخدم فارغًا.",
+  "usernameDialogCancel": "إلغاء",
+  "usernameDialogSave": "حفظ",
+  "usernameUpdatedSuccess": "تم تحديث اسم المستخدم بنجاح!",
+
+  "Settings": "الإعدادات",
+  "Account": "الحساب",
+  "Change Username": "تغيير اسم المستخدم",
+  "Change Password": "تغيير كلمة المرور",
+  "AI Settings": "إعدادات مخيمر",
+  "Model": "النموذج",
+  "Temperature": "درجة الحرارة",
+  "Preferences": "التفضيلات",
+  "Language": "اللغة",
+  "English": "الإنجليزية",
+  "Arabic": "العربية",
+  "Light Mode": "الوضع الفاتح",
+  "Dark Mode": "الوضع الداكن"
 }

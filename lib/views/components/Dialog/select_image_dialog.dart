@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mekhemar/views/components/Text/custom_text.dart';
-import 'package:mekhemar/views/components/button/custom_button.dart';
+
+import '../Text/custom_text.dart';
+import '../button/custom_button.dart';
 
 class SelectImageDialog extends StatelessWidget {
   const SelectImageDialog({super.key});

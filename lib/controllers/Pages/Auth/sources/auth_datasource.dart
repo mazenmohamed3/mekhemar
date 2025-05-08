@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:mekhemar/views/components/Snack%20Bar/failed_snackbar.dart';
 import '../../../../models/Auth/input/user_model.dart';
 import '../../../../models/Auth/response/firebase_auth_model.dart';
 import '../../../../views/components/Dialog/stay_signed_in_dialog.dart';
+import '../../../../views/components/Snack Bar/failed_snackbar.dart';
 import '../../../Router/app_page.dart';
 import '../services/auth_service.dart';
 import '../services/chat_cleanup_service.dart';
@@ -207,7 +207,7 @@ class AuthDatasource {
     final userId = userMessage?.user?.uid;
     await setRememberMe(false);
 
-    // Sign out from auth services
+    // Sign out from auth Services
     await _auth.signOut();
     await _googleSignIn.signOut();
 

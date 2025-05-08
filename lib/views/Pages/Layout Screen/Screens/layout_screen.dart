@@ -32,10 +32,11 @@ class _LayoutScreenState extends State<LayoutScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: widget.navigationShell.currentIndex,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        indicatorColor: Theme.of(context).colorScheme.primaryContainer,
         indicatorShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
             10.r,
-          ), // Set the radius of the indicator
+          ),
         ),
         onDestinationSelected:
             (value) => widget.layoutController.onDestinationSelected(

@@ -110,5 +110,38 @@
   "home": "Home",
   "settings": "Settings",
 
-  "initialPrompt": "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa."
+  "initialPrompt": "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.",
+
+  "changePassword": "Change Password",
+  "enterNewPassword": "Enter your new password below.",
+  "passwordDialogLabel": "Password",
+  "passwordDialogHint": "••••••••",
+  "passwordEmpty": "Password cannot be empty.",
+  "passwordDialogTooShort": "Password must be at least 6 characters.",
+  "passwordDialogCancel": "Cancel",
+  "passwordDialogSave": "Save",
+  "passwordUpdatedSuccess": "Password updated successfully!",
+
+  "enterUsername": "Enter Username",
+  "enterNewUsername": "Please enter a new username.",
+  "usernameLabel": "Username",
+  "usernameHint": "e.g. johndoe",
+  "usernameEmpty": "Username cannot be empty.",
+  "usernameDialogCancel": "Cancel",
+  "usernameDialogSave": "Save",
+  "usernameUpdatedSuccess": "Username updated successfully!",
+
+  "Settings": "Settings",
+  "Account": "Account",
+  "Change Username": "Change Username",
+  "Change Password": "Change Password",
+  "AI Settings": "Mekhemar Settings",
+  "Model": "Model",
+  "Temperature": "Temperature",
+  "Preferences": "Preferences",
+  "Language": "Language",
+  "English": "English",
+  "Arabic": "Arabic",
+  "Light Mode": "Light Mode",
+  "Dark Mode": "Dark Mode"
 }

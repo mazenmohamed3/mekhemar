@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mekhemar/views/components/Text/custom_text.dart';
-import 'package:mekhemar/views/components/button/custom_button.dart';
 import '../../../../controllers/Pages/Onboarding/controllers/onboarding_controller.dart';
+import '../../../components/Text/custom_text.dart';
+import '../../../components/button/custom_button.dart';
 import '../../../components/other/logo_widget.dart';
 
 class OnboardingScreen extends StatefulWidget {

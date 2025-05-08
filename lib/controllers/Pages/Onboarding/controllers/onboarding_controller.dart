@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../Repos/local/secure_storage_helper.dart';
 import '../../../Router/app_page.dart';
 
 class OnboardingController {
@@ -87,12 +88,22 @@ class OnboardingController {
     });
   }
 
-  void onEnglishPressed(BuildContext context) {
+  void onEnglishPressed(BuildContext context) async {
+    await SecureStorageHelper.writeValueToKey(
+      key: 'isFirstTime',
+      value: 'false',
+    );
+    if(!context.mounted) return;
     context.setLocale(Locale('en'));
     context.go(AppPage.login);
   }
 
-  void onArabicPressed(BuildContext context) {
+  void onArabicPressed(BuildContext context) async {
+    await SecureStorageHelper.writeValueToKey(
+      key: 'isFirstTime',
+      value: 'false',
+    );
+    if(!context.mounted) return;
     context.setLocale(Locale('ar'));
     context.go(AppPage.login);
   }

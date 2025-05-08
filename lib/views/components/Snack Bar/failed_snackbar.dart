@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mekhemar/controllers/Theme/theme.dart';
 
 import '../../../controllers/Generated/Assets/assets.dart';
+import '../../../controllers/Theme/Theme Data/theme.dart';
 import '../Text/custom_text.dart';
 
 void showFailedSnackBar(
@@ -30,7 +30,7 @@ void showFailedSnackBar(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Image.asset(
-                  Assets.error, 
+                  Assets.error,
                   height: 25.h,
                   color: AppTheme.defaultTextColor(context),
                 ),
