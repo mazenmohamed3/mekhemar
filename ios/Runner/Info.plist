@@ -55,5 +55,11 @@
     <string>We need microphone access to record your voice messages</string>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>We need access to your speech recognition to convert your voice into text.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to your camera to take profile photos.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library to select a photo for your profile.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Your location is needed to show your city and country</string>
 </dict>
 </plist>

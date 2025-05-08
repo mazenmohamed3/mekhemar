@@ -6,10 +6,11 @@ class Assets {
   static const String success = 'assets/images/success.png';
   static const String error = 'assets/images/error.png';
   static const String drawer = 'assets/images/drawer.png';
-  static const String create = 'assets/images/create.svg';
-  static const String mail = 'assets/images/mail.svg';
-  static const String phone = 'assets/images/phone.svg';
-  static const String logout = 'assets/images/logout.svg';
+  static const String create = 'assets/images/create.png';
+  static const String mail = 'assets/images/mail.png';
+  static const String phone = 'assets/images/phone.png';
+  static const String logout = 'assets/images/logout.png';
+  static const String location = 'assets/images/location.png';
   //translations
   static const String translations = 'assets/translations';
 }

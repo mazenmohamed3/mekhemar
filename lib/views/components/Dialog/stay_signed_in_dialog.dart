@@ -16,11 +16,11 @@ class StaySignedInDialog extends StatelessWidget {
           children: [
             Expanded(
               child: CustomButton(
-                  color: Theme.of(context).colorScheme.onError,
+                  color: Theme.of(context).colorScheme.errorContainer,
                   onPressed: () {
                   context.pop(false); // No
                 },
-                text: 'staySignedInNoButtonLabel'
+                text: 'staySignedInNoButtonLabel',
               ),
             ),
             const SizedBox(width: 8),

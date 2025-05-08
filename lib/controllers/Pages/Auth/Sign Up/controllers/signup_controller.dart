@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekhemar/controllers/Router/app_page.dart';
 
+import '../../../../../models/Auth/input/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../sources/auth_datasource.dart';
 
@@ -189,12 +190,13 @@ class SignupController {
       try {
         toggleIsLoading(value: true);
 
-        await _authDataSource.signUp(
-          context: context,
+        final userModel = UserModel(
           email: emailController.text,
-          password: usernameController.text,
-          name: passwordController.text,
+          username: usernameController.text,
+          password: passwordController.text,
         );
+
+        await _authDataSource.signUp(userModel: userModel, context: context);
 
         if (!context.mounted) return;
         dispose();

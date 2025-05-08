@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekhemar/controllers/Pages/Auth/services/auth_service.dart';
+import '../../../../models/Auth/input/user_model.dart';
 import '../../../../views/components/Snack Bar/failed_snackbar.dart';
 import '../../../Features/Biometric/Controller/biometric_controller.dart';
 import '../../../Repos/local/secure_storage_helper.dart';
@@ -44,10 +45,11 @@ class SplashController {
               showDialogPrompt: false,
             );
           } else {
+            final userModel = UserModel(email: email!, password: password!);
+
             if (!context.mounted) return;
             await _authDatasource.emailAndPasswordLogin(
-              email: email!, // Assert it's non-null
-              password: password!,
+              userModel: userModel,
               rememberMe: true,
               context: context,
             );
@@ -80,15 +82,17 @@ class SplashController {
     required String message,
     List<String>? args,
   }) async {
-    // Clear saved login credentials
-    await SecureStorageHelper.deleteValueFromKey(key: 'email');
-    await SecureStorageHelper.deleteValueFromKey(key: 'password');
-    await SecureStorageHelper.deleteValueFromKey(key: 'isGoogleSignIn');
+    await SecureStorageHelper.clearAllValues();
+    await SecureStorageHelper.writeValueToKey(
+      key: 'isFirstTime',
+      value: 'false',
+    );
+
+    await AuthService.setRememberMe(false);
 
     if (!context.mounted) return;
     showFailedSnackBar(context, title: message, args: args);
 
-    // Redirect to login
     context.go(AppPage.login);
   }
 
@@ -100,14 +104,12 @@ class SplashController {
     );
 
     if (isFirstTime == null) {
-      // First time ever opening the app
       await SecureStorageHelper.writeValueToKey(
         key: 'isFirstTime',
         value: 'false',
       );
 
       if (!context.mounted) return;
-
       context.go(AppPage.onboarding);
     } else if (await AuthService.getRememberMe()) {
       if (!context.mounted) return;

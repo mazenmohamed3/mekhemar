@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../models/Home/chat_model.dart';
 import '../../../Repos/local/secure_storage_helper.dart';
-import '../../Layout/Controllers/Layout Pages Controllers/Home/Services/chat_service.dart';
 
 class AuthService {
   static const _rememberMeKey = 'rememberMe';
-  Map<String, ChatService> chatHistory = {};
+  Map<String, ChatModel> chatHistory = {};
 
   // FirebaseAuth error mapper
   String handleFirebaseAuthException(FirebaseAuthException e) {

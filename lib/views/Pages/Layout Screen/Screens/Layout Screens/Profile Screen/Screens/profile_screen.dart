@@ -1,59 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mekhemar/views/Pages/Layout%20Screen/Screens/Layout%20Screens/Profile%20Screen/widgets/profile_image_widget.dart';
 import 'package:mekhemar/views/components/Text/custom_text.dart';
-
 import '../../../../../../../controllers/Generated/Assets/assets.dart';
 import '../../../../../../../controllers/Pages/Layout/Controllers/Layout Pages Controllers/Profile/Controllers/profile_controller.dart';
 import '../widgets/profile_tile_widget.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.profileController});
 
   final ProfileController profileController;
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    widget.profileController.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            CustomText(
-              text: "Hesham Abaza",
-              textAlign: TextAlign.center,
-              fontWeight: FontWeight.w700,
-              fontSize: 32.sp,
-            ),
-            SizedBox(height: 64.h,),
-            ProfileTileWidget(
-              asset: Assets.mail,
-              iconHeight: 42.h,
-              iconWidth: 42.w,
-              title: "Email",
-              subtitle: "heshamabaza1@gmail.com",
-              subtitleDecoration: TextDecoration.underline,
-            ),
-            SizedBox(height: 32.h,),
-            ProfileTileWidget(
-              asset: Assets.phone,
-              iconHeight: 42.h,
-              iconWidth: 42.w,
-              title: "Phone",
-              subtitle: "010123456789",
-            ),
-            SizedBox(height: 32.h,),
-            ProfileTileWidget(
-              asset: Assets.logout,
-              iconColor: Theme.of(context).colorScheme.error,
-              iconHeight: 42.h,
-              iconWidth: 42.w,
-              title: "Sign out",
-              onPressed: () => profileController.logout(context),
-              titleColor: Theme.of(context).colorScheme.error,
-            ),
-          ],
+      body: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 32.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: StatefulBuilder(
+                  builder: (context, setProfileState) {
+                    widget.profileController.setProfileState = setProfileState;
+                    return ProfileImageWidget(
+                      onTap:
+                          () => widget.profileController.onProfileTap(context),
+                      displayName: widget.profileController.displayName,
+                      photoURL: widget.profileController.photoUrl,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 32.h),
+              CustomText(
+                text: widget.profileController.displayName!,
+                textAlign: TextAlign.center,
+                fontWeight: FontWeight.w700,
+                fontSize: 32.sp,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 64.h),
+              ProfileTileWidget(
+                asset: Assets.mail,
+                iconHeight: 42.h,
+                iconWidth: 42.w,
+                title: "email",
+                subtitle: widget.profileController.email!,
+                subtitleDecoration: TextDecoration.underline,
+              ),
+              SizedBox(height: 32.h),
+              StatefulBuilder(
+                builder: (context, setPhoneState) {
+                  widget.profileController.setPhoneState = setPhoneState;
+                  return ProfileTileWidget(
+                    asset: Assets.phone,
+                    iconHeight: 42.h,
+                    iconWidth: 42.w,
+                    title: "phone",
+                    subtitle: widget.profileController.phone,
+                    onPressed: widget.profileController.onPhoneTap(context),
+                  );
+                },
+              ),
+              SizedBox(height: 32.h),
+              StatefulBuilder(
+                builder: (context, setLocationState) {
+                  widget.profileController.setLocationState = setLocationState;
+                  return ProfileTileWidget(
+                    asset: Assets.location,
+                    iconHeight: 42.h,
+                    iconWidth: 42.w,
+                    title: "location",
+                    subtitle: widget.profileController.location,
+                  );
+                },
+              ),
+              SizedBox(height: 32.h),
+              ProfileTileWidget(
+                asset: Assets.logout,
+                iconColor: Theme.of(context).colorScheme.error,
+                iconHeight: 42.h,
+                iconWidth: 42.w,
+                title: "signOut",
+                onPressed: () => widget.profileController.logout(context),
+                titleColor: Theme.of(context).colorScheme.error,
+              ),
+            ],
+          ),
         ),
       ),
     );

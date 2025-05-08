@@ -71,5 +71,44 @@
   "biometricFailed": "فشل التحقق البيومتري. يرجى المحاولة مرة أخرى.",
   "biometricUnsupported": "جهازك لا يدعم التحقق البيومتري.",
   "loginFailed": "فشل تسجيل الدخول: {0}",
-  "noSavedCredentials": "لم يتم العثور على بيانات تسجيل دخول محفوظة. يرجى تسجيل الدخول يدويًا."
+  "noSavedCredentials": "لم يتم العثور على بيانات تسجيل دخول محفوظة. يرجى تسجيل الدخول يدويًا.",
+
+  "enterPhoneNumber": "أدخل رقم الهاتف",
+  "verificationMessage": "سنرسل رمز التحقق إلى هذا الرقم.",
+  "phoneNumber": "رقم الهاتف",
+  "cancel": "إلغاء",
+  "sendCode": "إرسال الرمز",
+  "phoneNumberEmpty": "رقم الهاتف لا يمكن أن يكون فارغاً",
+  "invalidPhoneNumber": "يرجى إدخال رقم هاتف صالح، فقط الأرقام و '+' اختياري في البداية",
+
+  "selectImage": "اختر الصورة",
+  "choosePhoto": "اختر صورة لتحميلها.",
+  "fromGallery": "من المعرض",
+  "fromCamera": "من الكاميرا",
+
+  "appTitle": "خدمات ميخمار AI",
+  "chatHistory": "سجل الدردشة",
+  "recordMessage": "جاري التسجيل...",
+  "typeMessage": "اكتب رسالتك...",
+
+  "email": "البريد الإلكتروني",
+  "phone": "الهاتف",
+  "location": "الموقع",
+  "signOut": "تسجيل الخروج",
+
+  "locationLoading": "جارٍ تحميل الموقع...",
+  "noPhone": "اضغط لإضافة رقم الهاتف",
+  "pleaseGrantPermissions": "يرجى منح الأذونات.",
+  "noImageSelected": "لم يتم اختيار صورة.",
+  "profilePhotoUpdated": "تم تحديث صورة الملف الشخصي.",
+  "failedToUploadCloudinary": "فشل تحميل الصورة على Cloudinary.",
+  "uploadError": "خطأ في التحميل: {error}",
+  "phoneNumberUpdated": "تم تحديث رقم الهاتف بنجاح!",
+  "phoneNumberUpdateFailed": "فشل تحديث رقم الهاتف: {error}",
+
+  "profile": "الملف الشخصي",
+  "home": "الرئيسية",
+  "settings": "الإعدادات",
+
+  "initialPrompt": "اسمك هو ميخمار بنها، وقد تم تصميمك بواسطة فريق مازن ليتم تقديمك إلى الدكتورة لمياء."
 }

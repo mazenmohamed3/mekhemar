@@ -4,6 +4,8 @@ import 'package:mekhemar/controllers/Pages/Onboarding/controllers/onboarding_con
 import 'package:mekhemar/controllers/Pages/Splash/controllers/splash_controller.dart';
 
 import '../Features/Biometric/Controller/biometric_controller.dart';
+import '../Features/Cloud Image/Controller/cloudinary_controller.dart';
+import '../Features/Location/Controller/location_controller.dart';
 import '../Pages/Auth/Forget Password/controllers/forget_password_controller.dart';
 import '../Pages/Auth/Login/controllers/login_controller.dart';
 import '../Pages/Auth/Sign Up/controllers/signup_controller.dart';
@@ -21,6 +23,8 @@ class AppControllers {
   //Controllers
     //Features
   static BiometricController biometricController = BiometricController();
+  static LocationController locationController = LocationController();
+  static CloudinaryController cloudinaryController = CloudinaryController();
   //Pages
   static SplashController splashController = SplashController(authDatasource, biometricController);
   static OnboardingController onboardingController = OnboardingController();
@@ -29,5 +33,5 @@ class AppControllers {
   static SignupController signupController = SignupController(authDatasource, loginService);
   static LayoutController layoutController = LayoutController();
   static HomeController homeController = HomeController(voiceService: voiceService);
-  static ProfileController profileController = ProfileController(authDatasource: authDatasource);
+  static ProfileController profileController = ProfileController(authDatasource: authDatasource, locationController: locationController, cloudinaryController: cloudinaryController);
 }

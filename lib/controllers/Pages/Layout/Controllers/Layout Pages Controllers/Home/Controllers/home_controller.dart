@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,71 +14,181 @@ import 'package:groq_sdk/models/groq_message.dart';
 import 'package:mekhemar/views/components/Snack%20Bar/failed_snackbar.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../../../../models/Home/chat_model.dart';
+import '../../../../../../../models/Home/home_model.dart';
 import '../../../../../../Generated/Assets/assets.dart';
 import '../../../../../../Repos/local/secure_storage_helper.dart';
-import '../Services/chat_service.dart';
+import '../../Profile/services/profile_update_service.dart';
 import '../Services/voice_service.dart';
 
 class HomeController {
-  HomeController({required this.voiceService});
+  HomeController({required this.voiceService}) {
+    // Initialize model and chat session
+    _uuid = Uuid();
+
+    // Initialize chat users
+    grokChatUser = ChatUser(
+      id: "666",
+      firstName: "Mekhemar",
+      lastName: "Banha",
+      profileImage: Assets.logoWhite,
+    );
+
+    // Subscribe to profile updates
+    _profileNotifier = ProfileUpdateNotifier();
+    _profileSubscription = _profileNotifier.profileUpdates.listen(_handleProfileUpdate);
+  }
 
   // == STATE AND CONTROLLERS ==
   late void Function(void Function()) setState;
+  late HomeModel _model;
 
   final Groq _groq = Groq(dotenv.env['GROQ_API_KEY']!);
-  final _uuid = Uuid();
-
+  late final Uuid _uuid;
+  late final ChatUser grokChatUser;
   GroqChat? _currentChatSession;
   VoiceService voiceService;
   User? user;
 
-  // == SESSION & CHAT DATA ==
-  String? _currentSessionId;
-  bool isTyping = false;
-  DateTime? recordingStartTime;
+  // Profile notification system
+  late final ProfileUpdateNotifier _profileNotifier;
+  late final StreamSubscription _profileSubscription;
+
+  // == GETTERS AND SETTERS FOR MODEL DATA ==
+  List<ChatMessage> get messages => _model.messages;
+
+  Map<String, ChatModel> get chatHistory => _model.chatHistory;
+
+  bool get isTyping => _model.isTyping;
 
   bool get isRecording => voiceService.isRecording;
 
+  String? get currentSessionId => _model.currentSessionId;
+
+  DateTime? get recordingStartTime => _model.recordingStartTime;
+
+  ChatUser get currentUser => _model.currentUser!;
+
   set isRecording(bool value) {
     voiceService.isRecording = value;
+    _model.setRecording(value);
     setState(() {}); // automatically trigger rebuild if needed
   }
 
-  List<ChatMessage> messages = [];
-  Map<String, ChatService> chatHistory = {};
-
-  final ChatUser grokChatUser = ChatUser(
-    id: "666",
-    firstName: "Mekhemar",
-    lastName: "Banha",
-    profileImage: Assets.logoWhite,
-  );
-
-  ChatUser currentUser = ChatUser(
-    id: "69420",
-    firstName: "Mekhemar",
-    profileImage: "",
-  );
-
   void initState(void Function(void Function()) setState) async {
-    _currentChatSession = _groq.startNewChat(
-      GroqModels.llama3_70b,
-      settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
-    );
-    final message =
-        "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
-    _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
     this.setState = setState;
     user = FirebaseAuth.instance.currentUser;
-    messages = [];
-    chatHistory = {};
-    print("===============================> ${user?.displayName}");
-    currentUser = ChatUser(
+    _model = HomeModel();
+
+    // Initialize current user in model
+    _model.currentUser = ChatUser(
       id: "69420",
       firstName: user?.displayName ?? "Mekhemar",
       profileImage: user?.photoURL ?? "",
     );
+
+    // Initialize chat session
+    _initializeNewChatSession();
+
+    print("===============================> ${user?.displayName}");
     await loadChatHistory();
+  }
+
+  // Handle profile updates
+  void _handleProfileUpdate(ProfileUpdateEvent event) {
+    // Only process events for the current user
+    if (user?.uid != event.userId) return;
+
+    if (event.photoUrl != null) {
+      // Update current user's profile image
+      setState(() {
+        _model.currentUser = ChatUser(
+          id: _model.currentUser!.id,
+          firstName: _model.currentUser!.firstName,
+          lastName: _model.currentUser!.lastName,
+          profileImage: event.photoUrl!,
+        );
+      });
+
+      // Update profile image in all chat messages
+      _updateUserInChatHistory(event.photoUrl!);
+    }
+
+    // Handle other profile updates if needed
+    if (event.displayName != null) {
+      // Update display name if needed
+      setState(() {
+        _model.currentUser = ChatUser(
+          id: _model.currentUser!.id,
+          firstName: event.displayName!,
+          lastName: _model.currentUser!.lastName,
+          profileImage: _model.currentUser!.profileImage,
+        );
+      });
+    }
+  }
+
+  // Update user profile in all chat messages
+  void _updateUserInChatHistory(String newPhotoUrl) {
+    setState(() {
+      // Update current messages
+      for (int i = 0; i < messages.length; i++) {
+        final message = messages[i];
+        if (message.user.id == currentUser.id) {
+          messages[i] = ChatMessage(
+            user: ChatUser(
+              id: message.user.id,
+              firstName: message.user.firstName,
+              lastName: message.user.lastName,
+              profileImage: newPhotoUrl,
+            ),
+            createdAt: message.createdAt,
+            text: message.text,
+          );
+        }
+      }
+
+      // Update all chat history sessions
+      chatHistory.forEach((sessionId, chatModel) {
+        final updatedMessages = chatModel.messages.map((message) {
+          if (message.user.id == currentUser.id) {
+            return ChatMessage(
+              user: ChatUser(
+                id: message.user.id,
+                firstName: message.user.firstName,
+                lastName: message.user.lastName,
+                profileImage: newPhotoUrl,
+              ),
+              createdAt: message.createdAt,
+              text: message.text,
+            );
+          }
+          return message;
+        }).toList();
+
+        _model.updateChatService(
+          ChatModel(
+            id: chatModel.id,
+            title: chatModel.title,
+            messages: updatedMessages,
+          ),
+        );
+      });
+    });
+
+    // Persist updated chat history
+    _persistChatHistory();
+  }
+
+  void _initializeNewChatSession() {
+    _currentChatSession = _groq.startNewChat(
+      GroqModels.llama3_70b,
+      settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
+    );
+
+    // Send system prompt
+    final message = "initialPrompt".tr();
+    _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
   }
 
   void scrollToBottom(ScrollController controller) {
@@ -96,15 +207,12 @@ class HomeController {
       if (!isRecording) {
         isRecording = true;
         setState(() {
-          recordingStartTime = DateTime.now();
+          _model.recordingStartTime = DateTime.now();
         });
-        await voiceService.startListening();
+        await voiceService.startListening(context);
       } else {
         await voiceService.stopListening();
-        setState(() {
-          isRecording = false;
-          recordingStartTime = null;
-        });
+        isRecording = false;
 
         final transcribedText = voiceService.wordsSpoken.trim();
         if (transcribedText.isEmpty || voiceService.confidence < 0.4) {
@@ -122,10 +230,7 @@ class HomeController {
       }
     } catch (e) {
       print('Speech error: $e');
-      setState(() {
-        isRecording = false;
-        recordingStartTime = null;
-      });
+      isRecording = false;
 
       if (!context.mounted) return;
       showFailedSnackBar(context, title: e.toString());
@@ -134,8 +239,6 @@ class HomeController {
 
   // == CHAT & HISTORY LOGIC ==
   Future<void> loadChatHistory() async {
-    await _syncChatSources(); // Add this line first
-
     final userId = FirebaseAuth.instance.currentUser!.uid;
     String? jsonString = await SecureStorageHelper.readValueFromKey(
       key: 'chatHistory_$userId',
@@ -144,25 +247,25 @@ class HomeController {
     // If the data is not found in secure storage, fetch it from Firestore
     if (jsonString == null) {
       try {
-        final doc =
-            await FirebaseFirestore.instance
-                .collection('chat_histories')
-                .doc(userId)
-                .get();
+        final doc = await FirebaseFirestore.instance
+            .collection('chat_histories')
+            .doc(userId)
+            .get();
 
         if (doc.exists && doc.data()?['data'] != null) {
           final dataField = doc.data()?['data'];
 
           if (dataField is List) {
             // Convert Firestore data to ChatService objects
-            List<ChatService> services =
-                dataField.map((entry) {
-                  final map = Map<String, dynamic>.from(entry);
-                  return ChatService.fromJson(map);
-                }).toList();
+            List<ChatModel> services = dataField.map((entry) {
+              final map = Map<String, dynamic>.from(entry);
+              return ChatModel.fromJson(map);
+            }).toList();
 
             // Optionally, map to a chatHistory map for easy access later
-            chatHistory = {for (final service in services) service.id: service};
+            Map<String, ChatModel> historyCopy = {
+              for (final service in services) service.id: service,
+            };
 
             // Flatten all messages from all services
             final allMessages = services.expand((s) => s.messages).toList();
@@ -171,7 +274,7 @@ class HomeController {
             await SecureStorageHelper.writeValueToKey(
               key: 'chatHistory_$userId',
               value: jsonEncode(
-                chatHistory.values.map((e) => e.toJson()).toList(),
+                historyCopy.values.map((e) => e.toJson()).toList(),
               ),
             );
 
@@ -182,7 +285,7 @@ class HomeController {
 
             // Debug logs
             print(
-              "===============================> saving chat history: ${chatHistory.values.map((e) => e.title)}",
+              "===============================> saving chat history: ${historyCopy.values.map((e) => e.title)}",
             );
             print(
               "===============================> saving chat messages: ${allMessages.length}",
@@ -193,12 +296,10 @@ class HomeController {
 
             // Now, update the UI by calling setState after fetching from Firestore
             setState(() {
-              // Add entries to chatHistory (trigger UI update)
-              chatHistory.addEntries(
-                services.map((service) {
-                  return MapEntry(service.id, service);
-                }),
-              );
+              // Add entries to chatHistory via model (trigger UI update)
+              for (final service in services) {
+                _model.addChatService(service);
+              }
             });
           } else {
             print(
@@ -222,17 +323,24 @@ class HomeController {
       try {
         final List<dynamic> jsonList = jsonDecode(jsonString);
         setState(() {
-          chatHistory.addEntries(
-            jsonList.map((json) {
-              final session = ChatService.fromJson(json);
-              return MapEntry(session.id, session);
-            }),
-          );
+          for (var json in jsonList) {
+            final session = ChatModel.fromJson(json);
+            _model.addChatService(session);
+          }
         });
       } catch (e) {
         print('Error decoding chat history: $e');
       }
     }
+
+    // Ensure all loaded chat messages have the most current profile image
+    if (user?.photoURL != null) {
+      _updateUserInChatHistory(user!.photoURL!);
+    }
+
+    // Reverse the order of messages when displaying them, if necessary
+    _model.messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    setState(() {});  // Trigger a rebuild to update the UI
   }
 
   Future<void> getChatResponse({
@@ -240,24 +348,17 @@ class HomeController {
     required void Function(void Function()) setState,
   }) async {
     setState(() {
-      messages.insert(0, message);
-      isTyping = true;
+      _model.addMessage(message);
+      _model.setTyping(true);
     });
 
     try {
       if (_currentChatSession == null) {
-        _currentChatSession = _groq.startNewChat(
-          GroqModels.llama3_70b,
-          settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
-        );
+        _initializeNewChatSession();
 
-        // Now send the initial message
-        final message =
-            "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
-        _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
-
+        // Add history messages to the new chat session
         for (final msg in messages.reversed.skip(1)) {
-          if (msg.user == currentUser) {
+          if (msg.user.id == currentUser.id) {
             await _currentChatSession!.sendMessage(
               msg.text,
               role: GroqMessageRole.user,
@@ -273,9 +374,8 @@ class HomeController {
       for (var choice in chatResponse.choices) {
         if (choice.message.isNotEmpty) {
           setState(() {
-            setState(() => isTyping = false);
-            messages.insert(
-              0,
+            _model.setTyping(false);
+            _model.addMessage(
               ChatMessage(
                 user: grokChatUser,
                 createdAt: DateTime.now(),
@@ -290,19 +390,19 @@ class HomeController {
     } catch (e) {
       print('Error during chat response: $e');
     } finally {
-      setState(() => isTyping = false);
+      setState(() => _model.setTyping(false));
     }
   }
 
   Future<void> saveCurrentChatSession({bool clearMessages = true}) async {
     if (messages.isEmpty) return;
 
-    String uniqueId = _currentSessionId ?? _uuid.v4();
+    String uniqueId = currentSessionId ?? _uuid.v4();
     String summaryTitle = "New Chat";
     bool shouldGenerateTitle = true;
 
-    if (_currentSessionId != null) {
-      final existingSession = chatHistory[_currentSessionId]!;
+    if (currentSessionId != null) {
+      final existingSession = chatHistory[currentSessionId]!;
       if (_areMessagesEqual(messages, existingSession.messages)) {
         summaryTitle = existingSession.title;
         shouldGenerateTitle = false;
@@ -311,9 +411,8 @@ class HomeController {
 
     if (shouldGenerateTitle) {
       final chatSession = _groq.startNewChat(GroqModels.llama3_70b);
-      final message =
-          "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
-      _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
+      final message = "initialPrompt".tr();
+      chatSession.sendMessage(message, role: GroqMessageRole.system);
       final systemPrompt =
           "Generate a concise 3-6 word title capturing the main topic. "
           "Return only the title without quotes, colons, or explanations. "
@@ -347,43 +446,38 @@ class HomeController {
     }
 
     setState(() {
-      chatHistory[uniqueId] = ChatService(
+      final newService = ChatModel(
         id: uniqueId,
         title: summaryTitle,
         messages: List.from(messages),
       );
+      _model.addChatService(newService);
 
       if (clearMessages) {
-        messages.clear();
-        _currentSessionId = null;
+        _model.resetSession();
       } else {
-        _currentSessionId = uniqueId;
+        _model.currentSessionId = uniqueId;
       }
     });
 
     await _persistChatHistory();
   }
 
-  Future<void> loadChatSession(ChatService session) async {
-    if (messages.isNotEmpty && _currentSessionId == null) {
+  Future<void> loadChatSession(ChatModel session) async {
+    if (messages.isNotEmpty && currentSessionId == null) {
       await saveCurrentChatSession();
     }
 
     _currentChatSession = null;
     setState(() {
-      messages
-        ..clear()
-        ..addAll(session.messages);
-      _currentSessionId = session.id;
+      _model.resetSession();
+      for (var message in session.messages.reversed) {
+        _model.addMessage(message);
+      }
+      _model.currentSessionId = session.id;
     });
 
-    _currentChatSession = _groq.startNewChat(
-      GroqModels.llama3_70b,
-      settings: GroqChatSettings(temperature: 0.8, maxTokens: 512),
-    );
-    final message =
-        "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa.";
-    _currentChatSession!.sendMessage(message, role: GroqMessageRole.system);
+    _initializeNewChatSession();
 
     final historyPrompt = session.messages.reversed
         .map((msg) => "${msg.user.firstName}: ${msg.text}")
@@ -405,11 +499,10 @@ class HomeController {
     final userId = user!.uid;
 
     setState(() {
-      chatHistory.remove(sessionId);
+      _model.deleteChatService(sessionId);
 
-      if (_currentSessionId == sessionId) {
-        messages.clear();
-        _currentSessionId = null;
+      if (currentSessionId == sessionId) {
+        _model.resetSession();
       }
     });
 
@@ -448,93 +541,6 @@ class HomeController {
     }
   }
 
-  Future<void> _syncChatSources() async {
-    final userId = user!.uid;
-
-    // Get both data sources
-    final String? localData = await SecureStorageHelper.readValueFromKey(
-      key: 'chatHistory_$userId',
-    );
-    final DocumentSnapshot firestoreDoc =
-        await FirebaseFirestore.instance
-            .collection('chat_histories')
-            .doc(userId)
-            .get();
-
-    // Parse data
-    List<ChatMessage> localMessages = [];
-    List<ChatMessage> firestoreMessages = [];
-
-    if (localData != null) {
-      try {
-        final List<dynamic> jsonList = jsonDecode(localData);
-        localMessages =
-            jsonList
-                .map((json) => ChatService.fromJson(json))
-                .expand((service) => service.messages)
-                .toList();
-      } catch (e) {
-        print('Error parsing local messages: $e');
-      }
-    }
-
-    if (firestoreDoc.exists) {
-      try {
-        final data =
-            (firestoreDoc.data() as Map<String, dynamic>?)?['data']
-                as List<dynamic>? ??
-            [];
-        firestoreMessages =
-            data
-                .map(
-                  (entry) =>
-                      ChatService.fromJson(entry as Map<String, dynamic>),
-                )
-                .expand((service) => service.messages)
-                .toList();
-      } catch (e) {
-        print('Error parsing Firestore messages: $e');
-      }
-    }
-
-    // Compare messages
-    final bool needUpdate =
-        !_areMessagesEqual(localMessages, firestoreMessages);
-
-    if (needUpdate) {
-      if (firestoreMessages.isEmpty && localMessages.isNotEmpty) {
-        // Update Firestore from local storage
-        await _updateFirestoreFromLocal(localMessages);
-      } else if (localMessages.isEmpty && firestoreMessages.isNotEmpty) {
-        // Update local storage from Firestore
-        await _updateLocalFromFirestore(firestoreMessages);
-      } else {
-        // Both have data - compare timestamps (add modifiedAt field to your model)
-        // This example assumes Firestore is source of truth
-        await _updateLocalFromFirestore(firestoreMessages);
-      }
-    }
-  }
-
-  Future<void> _updateLocalFromFirestore(List<ChatMessage> messages) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    await SecureStorageHelper.writeValueToKey(
-      key: 'chatHistory_$userId',
-      value: jsonEncode(messages),
-    );
-  }
-
-  Future<void> _updateFirestoreFromLocal(List<ChatMessage> messages) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance
-        .collection('chat_histories')
-        .doc(userId)
-        .set({
-          'data': messages.map((m) => m.toJson()).toList(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-  }
-
   bool _areMessagesEqual(List<ChatMessage> a, List<ChatMessage> b) {
     if (a.length != b.length) return false;
     for (int i = 0; i < a.length; i++) {
@@ -563,5 +569,10 @@ class HomeController {
     } catch (e) {
       print('Error saving chat history to Firestore: $e');
     }
+  }
+
+  // Clean up resources
+  void dispose() {
+    _profileSubscription.cancel();
   }
 }

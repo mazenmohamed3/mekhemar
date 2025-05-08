@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -41,10 +42,10 @@ class _LayoutScreenState extends State<LayoutScreen> {
               navigationShell: widget.navigationShell,
               value: value,
             ),
-        destinations: const <NavigationDestination>[
-          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+        destinations: <NavigationDestination>[
+          NavigationDestination(icon: Icon(Icons.person), label: 'profile'.tr()),
+          NavigationDestination(icon: Icon(Icons.home), label: 'home'.tr()),
+          NavigationDestination(icon: Icon(Icons.settings), label: 'settings'.tr()),
         ],
       ),
     );

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class MyAppLifecycleHandler extends StatefulWidget {
+class MyAppLifecycleController extends StatefulWidget {
   final Widget child;
 
-  const MyAppLifecycleHandler({super.key, required this.child});
+  const MyAppLifecycleController({super.key, required this.child});
 
   @override
-  State<MyAppLifecycleHandler> createState() => _MyAppLifecycleHandlerState();
+  State<MyAppLifecycleController> createState() => _MyAppLifecycleControllerState();
 }
 
-class _MyAppLifecycleHandlerState extends State<MyAppLifecycleHandler>
+class _MyAppLifecycleControllerState extends State<MyAppLifecycleController>
     with WidgetsBindingObserver {
 
   @override

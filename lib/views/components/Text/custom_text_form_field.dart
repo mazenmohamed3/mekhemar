@@ -12,6 +12,7 @@ class CustomTextFormField extends StatefulWidget {
   final void Function()? onTapOutside;
   final void Function(String)? onFieldSubmitted;
   final void Function(String)? onChanged;
+  final Widget? prefixIcon;
 
   const CustomTextFormField({
     super.key,
@@ -25,6 +26,7 @@ class CustomTextFormField extends StatefulWidget {
     this.onFieldSubmitted,
     this.onTapOutside,
     this.onChanged,
+    this.prefixIcon,
   });
 
   @override
@@ -57,6 +59,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       decoration: InputDecoration(
         labelText: widget.label.tr(),
         hintText: widget.hintText.tr(),
+        prefixIcon: widget.prefixIcon,
         suffixIcon: widget.obscureText == true
             ? GestureDetector(
           onTap: _togglePasswordVisibility,

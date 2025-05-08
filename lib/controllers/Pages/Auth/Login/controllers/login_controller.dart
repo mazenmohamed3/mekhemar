@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../../models/Auth/input/user_model.dart';
 import '../../../../Router/app_page.dart';
 import '../../services/auth_service.dart';
 import '../../sources/auth_datasource.dart';
@@ -55,11 +56,16 @@ class LoginController {
   }
 
   void onChanged(String value) {
-    final isEmailValid = loginService.validateEmail(emailController.text) == null;
-    final isPasswordValid = loginService.validatePassword(passwordController.text) == null;
+    final isEmailValid =
+        loginService.validateEmail(emailController.text) == null;
+    final isPasswordValid =
+        loginService.validatePassword(passwordController.text) == null;
 
     // Check if both email and password are valid and the button is not loading
-    if (isEmailValid && isPasswordValid && !isEmailLoading && !isGoogleLoading) {
+    if (isEmailValid &&
+        isPasswordValid &&
+        !isEmailLoading &&
+        !isGoogleLoading) {
       setEmailButtonState(() {
         isEmailNoAction = false; // Enable the email button
       });
@@ -127,7 +133,7 @@ class LoginController {
         isGoogle: isGoogle,
         isApple: isApple,
       ); // Pass Apple state as well
-    }else {
+    } else {
       setEmailButtonState(() {
         isEmailLoading = value;
       });
@@ -147,19 +153,29 @@ class LoginController {
   Future<void> loginWithEmailAndPassword({
     required BuildContext context,
   }) async {
-    if(isGoogleLoading) return;
+    if (isGoogleLoading) return;
     if (formKey.currentState!.validate()) {
       try {
         toggleIsLoading(value: true, isGoogle: false);
-        await authDataSource.emailAndPasswordLogin(
-          rememberMe: rememberMe,
+
+        // Create a UserModel from the input values
+        UserModel userModel = UserModel(
           email: emailController.text,
           password: passwordController.text,
+        );
+
+        await authDataSource.emailAndPasswordLogin(
+          rememberMe: rememberMe,
+          userModel: userModel, // Pass the UserModel
           context: context,
         );
+
         if (!context.mounted) return;
+
         dispose();
-        context.go(AppPage.home);
+        context.go(
+          AppPage.home,
+        ); // Navigate to the home page after successful login
       } finally {
         toggleIsLoading(value: false, isGoogle: false);
       }
@@ -170,10 +186,13 @@ class LoginController {
 
   Future<void> loginWithGoogle({required BuildContext context}) async {
     try {
-      if(isEmailLoading) return;
+      if (isEmailLoading) return;
       toggleIsLoading(value: true, isGoogle: true);
+
       await authDataSource.signInWithGoogle(context: context);
+
       if (!context.mounted) return;
+
       dispose();
       context.go(AppPage.home);
     } finally {

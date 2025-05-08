@@ -5,8 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Added import
 
-import 'controllers/Features/App Lifecycle/Controllers/app_lifecycle.dart';
-import 'controllers/Features/Auto Detect Locale/Controller/init_locale.dart';
+import 'controllers/Features/App Lifecycle/Controllers/app_lifecycle_controller.dart';
+import 'controllers/Features/Auto Detect Locale/Controller/init_locale_controller.dart';
+import 'controllers/Features/Location/Controller/location_controller.dart';
 import 'controllers/Generated/Assets/assets.dart';
 import 'controllers/Router/app_router.dart';
 import 'controllers/Theme/theme.dart';
@@ -18,9 +19,8 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
-
-  // Get the initial locale using the method from app_initializer.dart
-  Locale initialLocale = await initializeAppLocale();
+  await LocationController.init();
+  Locale initialLocale = await InitLocaleController.initializeAppLocale();
 
   runApp(
     EasyLocalization(
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
       builder:
           (context, child) => AnnotatedRegion<Future<void>>(
             value: SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge),
-            child: MyAppLifecycleHandler(
+            child: MyAppLifecycleController(
               child: MaterialApp.router(
                 title: 'Mekhemar',
                 debugShowCheckedModeBanner: false,

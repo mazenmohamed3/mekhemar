@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mekhemar/views/components/Snack%20Bar/failed_snackbar.dart';
-import '../../../../models/user_model.dart';
+import '../../../../models/Auth/input/user_model.dart';
+import '../../../../models/Auth/response/firebase_auth_model.dart';
 import '../../../../views/components/Dialog/stay_signed_in_dialog.dart';
 import '../../../Router/app_page.dart';
 import '../services/auth_service.dart';
@@ -18,21 +19,21 @@ class AuthDatasource {
   UserCredential? userMessage;
 
   Future<FirebaseAuthResult> emailAndPasswordLogin({
-    required String email,
-    required String password,
+    required UserModel userModel,
     required bool rememberMe,
     required BuildContext context,
   }) async {
     try {
       await setRememberMe(rememberMe);
+
       // Sign in using email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: userModel.email,
+        password: userModel.password!,
       );
 
       // Save the UserCredential to the class variable
-      userMessage = userCredential; // <-- Add this line
+      userMessage = userCredential;
 
       final user = FirebaseAuthResult.fromUser(userCredential.user!);
 
@@ -40,7 +41,7 @@ class AuthDatasource {
       if (rememberMe) {
         await _loginService.saveLogin(
           email: user.email,
-          password: password,
+          password: userModel.password!,
           username: user.displayName ?? '',
           isGoogleSignIn: false,
         );
@@ -48,7 +49,7 @@ class AuthDatasource {
         await _loginService.clearSavedLogin();
       }
 
-      // Return custom FirebaseAuthResult model
+      // Return FirebaseAuthResult
       return user;
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
@@ -62,19 +63,21 @@ class AuthDatasource {
   }
 
   Future<FirebaseAuthResult> signUp({
-    required String email,
-    required String password,
-    required String name,
+    required UserModel userModel,
     required BuildContext context,
   }) async {
     try {
+      // Create user with email and password
       UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+          .createUserWithEmailAndPassword(
+            email: userModel.email,
+            password: userModel.password!,
+          );
 
-      await userCredential.user?.updateDisplayName(name);
+      await userCredential.user?.updateDisplayName(userModel.username);
       await userCredential.user?.reload();
 
-      userMessage = userCredential; // <-- Add this line
+      userMessage = userCredential;
 
       bool rememberMe = false;
 
@@ -88,19 +91,22 @@ class AuthDatasource {
         rememberMe = choice ?? false;
         await setRememberMe(rememberMe);
       }
+
       final user = FirebaseAuthResult.fromUser(userCredential.user!);
 
+      // Save user credentials if rememberMe is true
       if (rememberMe) {
         await _loginService.saveLogin(
           email: user.email,
-          password: password,
-          username: name,
+          password: userModel.password!,
+          username: userModel.username!,
           isGoogleSignIn: false,
         );
       } else {
         await _loginService.clearSavedLogin();
       }
 
+      // Return FirebaseAuthResult
       return user;
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
@@ -144,6 +150,7 @@ class AuthDatasource {
         rememberMe = choice ?? false;
         await setRememberMe(rememberMe);
       }
+
       final user = FirebaseAuthResult.fromUser(userCredential.user!);
 
       // Save login credentials if rememberMe is true
@@ -157,7 +164,8 @@ class AuthDatasource {
       } else if (showDialogPrompt) {
         await _loginService.clearSavedLogin();
       }
-      // Returning a custom result model (FirebaseAuthResult)
+
+      // Returning FirebaseAuthResult
       return user;
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
@@ -175,9 +183,9 @@ class AuthDatasource {
     }
   }
 
-  Future<void> resetPassword({required String email}) async {
+  Future<void> resetPassword({required UserModel user}) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await _auth.sendPasswordResetEmail(email: user.email);
     } on FirebaseAuthException catch (e) {
       throw _loginService.handleFirebaseAuthException(e);
     }

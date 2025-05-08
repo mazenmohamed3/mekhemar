@@ -71,5 +71,44 @@
   "biometricFailed": "Biometric authentication failed. Please try again.",
   "biometricUnsupported": "Your device does not support biometric authentication.",
   "loginFailed": "Login failed: {0}",
-  "noSavedCredentials": "No saved credentials found. Please log in manually."
+  "noSavedCredentials": "No saved credentials found. Please log in manually.",
+
+  "enterPhoneNumber": "Enter Phone Number",
+  "verificationMessage": "We will send a verification code to this number.",
+  "phoneNumber": "Phone Number",
+  "cancel": "Cancel",
+  "sendCode": "Send Code",
+  "phoneNumberEmpty": "Phone number cannot be empty",
+  "invalidPhoneNumber": "Please enter a valid phone number, only digits and optional '+' at the start",
+
+  "selectImage": "Select Image",
+  "choosePhoto": "Choose a photo to upload.",
+  "fromGallery": "From Gallery",
+  "fromCamera": "From Camera",
+
+  "appTitle": "Mekhemar AI Services",
+  "chatHistory": "Chat History",
+  "recordMessage": "Recording...",
+  "typeMessage": "Type your message...",
+
+  "email": "Email",
+  "phone": "Phone",
+  "location": "Location",
+  "signOut": "Sign out",
+
+  "locationLoading": "Loading location...",
+  "noPhone": "Press to Add Phone",
+  "pleaseGrantPermissions": "Please grant permissions.",
+  "noImageSelected": "No image selected.",
+  "profilePhotoUpdated": "Profile photo updated.",
+  "failedToUploadCloudinary": "Failed to upload to Cloudinary.",
+  "uploadError": "Upload error: {error}",
+  "phoneNumberUpdated": "Phone number updated successfully!",
+  "phoneNumberUpdateFailed": "Phone number update failed: {error}",
+
+  "profile": "Profile",
+  "home": "Home",
+  "settings": "Settings",
+
+  "initialPrompt": "Your name is Mekhemar Benha, and You were designed by Team Mazen to be presented to Dr. Lamiaa."
 }

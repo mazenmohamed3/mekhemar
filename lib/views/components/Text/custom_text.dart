@@ -43,7 +43,7 @@ class CustomText extends StatelessWidget {
     return Text(
       text.tr(args: argsToPass),
       textAlign: textAlign,
-      overflow: overflow,
+      overflow: overflow ?? TextOverflow.ellipsis,
       style: lang == 'en'
           ? googleFonts(
         decoration: textDecoration,

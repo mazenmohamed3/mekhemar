@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mekhemar/controllers/Pages/Layout/Controllers/Layout%20Pages%20Controllers/Home/Controllers/home_controller.dart';
 import 'package:mekhemar/controllers/Theme/theme.dart';
 import '../../../../../../../controllers/Generated/Assets/assets.dart';
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
         ),
         title: CustomText(
-          text: 'Mekhemar AI Services',
+          text: 'appTitle',
           fontSize: 20.sp,
           textAlign: TextAlign.center,
         ),
@@ -49,12 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
         actions: [
           IconButton(
-            icon: SvgPicture.asset(
+            icon: Image.asset(
               Assets.create,
-              colorFilter: ColorFilter.mode(
-                Theme.of(context).iconTheme.color!,
-                BlendMode.srcIn,
-              ), // ADAPT COLOR HERE
+              color: Theme.of(context).iconTheme.color!, // ADAPT COLOR HERE
             ),
             onPressed: widget.homeController.saveCurrentChatSession,
           ),
@@ -71,21 +68,22 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
               ),
-              child: const Text(
-                'Chat History',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+              child: CustomText(
+                text: 'chatHistory',
+                color: Colors.white,
+                fontSize: 24.sp,
               ),
             ),
             for (var session in widget.homeController.chatHistory.values)
               ListTile(
-                title: Text(session.title),
+                title: CustomText(text: session.title),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed:
                       () => widget.homeController.deleteChatSession(session.id),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
+                  context.pop();
                   widget.homeController.loadChatSession(session);
                 },
               ),
@@ -95,9 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: DashChat(
         currentUser: widget.homeController.currentUser,
         typingUsers:
-        widget.homeController.isTyping
-            ? [widget.homeController.grokChatUser]
-            : [],
+            widget.homeController.isTyping
+                ? [widget.homeController.grokChatUser]
+                : [],
         messages: widget.homeController.messages,
         onSend: (message) {
           widget.homeController.getChatResponse(
@@ -121,24 +119,30 @@ class _HomeScreenState extends State<HomeScreen> {
           separatorFrequency: SeparatorFrequency.hours,
         ),
         scrollToBottomOptions: ScrollToBottomOptions(
-          scrollToBottomBuilder: (scrollController) => Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 1),
-              child: MaterialButton(
-                onPressed: () => widget.homeController.scrollToBottom(scrollController),
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.9 * 255)),
-                elevation: 4,
-                height: 30,
-                shape: const CircleBorder(),
-                child: Icon(
-                  Icons.arrow_downward_rounded,
-                  size: 18,
-                  color: Theme.of(context).colorScheme.primary,
+          scrollToBottomBuilder:
+              (scrollController) => Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 1),
+                  child: MaterialButton(
+                    onPressed:
+                        () => widget.homeController.scrollToBottom(
+                          scrollController,
+                        ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: (0.9 * 255)),
+                    elevation: 4,
+                    height: 30,
+                    shape: const CircleBorder(),
+                    child: Icon(
+                      Icons.arrow_downward_rounded,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
         ),
         inputOptions: InputOptions(
           inputDisabled: widget.homeController.isRecording,
@@ -162,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (startTime == null) return SizedBox.shrink();
 
                         final duration = DateTime.now().difference(startTime);
-                        return Text('${duration.inSeconds}s');
+                        return CustomText(text: '${duration.inSeconds}s');
                       },
                     ),
                 ],
@@ -188,8 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             hintText:
                 widget.homeController.isRecording
-                    ? 'Recording...'
-                    : 'Type your message...',
+                    ? 'recordMessage'.tr()
+                    : 'typeMessage'.tr(),
           ).applyDefaults(Theme.of(context).inputDecorationTheme),
         ),
       ),

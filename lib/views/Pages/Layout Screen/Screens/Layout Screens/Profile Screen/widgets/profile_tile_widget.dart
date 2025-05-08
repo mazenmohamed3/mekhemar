@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../../../components/Text/custom_text.dart';
 
@@ -14,7 +13,8 @@ class ProfileTileWidget extends StatelessWidget {
     this.subtitle,
     this.subtitleDecoration,
     this.titleColor,
-    this.iconColor, this.onPressed,
+    this.iconColor,
+    this.onPressed,
   });
 
   final String asset;
@@ -29,45 +29,44 @@ class ProfileTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        TextButton(
-          onPressed: onPressed,
-          child: Row(
-            spacing: 16.w,
-            children: [
-              SvgPicture.asset(
-                asset,
-                width: iconWidth,
-                height: iconHeight,
-                colorFilter:
-                    iconColor != null
-                        ? ColorFilter.mode(iconColor!, BlendMode.srcIn)
-                        : null,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomText(
-                    text: title,
-                    fontWeight: FontWeight.w700,
-                    color: titleColor,
-                    fontSize: 32.sp,
-                  ),
-                  if (subtitle != null) ...{
-                    CustomText(
-                      text: subtitle!,
-                      textDecoration: subtitleDecoration ?? TextDecoration.none,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 24.sp,
-                    ),
-                  },
-                ],
-              ),
-            ],
+    return TextButton(
+      onPressed: onPressed,
+      child: Row(
+        mainAxisSize: MainAxisSize.max, // Let the row take all available space
+        children: [
+          Image.asset(
+            asset,
+            width: iconWidth,
+            height: iconHeight,
+            color: iconColor ?? Theme.of(context).iconTheme.color!,
           ),
-        ),
-      ],
+          SizedBox(width: 16.w), // Adds spacing between icon and text
+          Expanded(
+            // Ensures text takes remaining space
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomText(
+                  text: title,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
+                  fontSize: 24.sp,
+                  overflow: TextOverflow.ellipsis, // Handle overflow
+                ),
+                if (subtitle != null)
+                  CustomText(
+                    text: subtitle!,
+                    textDecoration: subtitleDecoration ?? TextDecoration.none,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16.sp,
+                    overflow: TextOverflow.clip, // Handle overflow
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
