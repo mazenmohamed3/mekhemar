@@ -257,7 +257,7 @@ class HomeController {
         setState(() {
           _model.recordingStartTime = DateTime.now();
         });
-        await voiceService.startListening(context);
+        await voiceService.startListening();
       } else {
         await voiceService.stopListening();
         isRecording = false;
@@ -281,6 +281,7 @@ class HomeController {
       isRecording = false;
 
       if (!context.mounted) return;
+      print('error is =========================> ${e.toString()}');
       showFailedSnackBar(context, title: e.toString());
     }
   }
