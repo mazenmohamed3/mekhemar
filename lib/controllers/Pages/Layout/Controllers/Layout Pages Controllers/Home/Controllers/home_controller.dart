@@ -23,7 +23,7 @@ import '../../Settings/Services/settings_update_service.dart';
 import '../Services/voice_service.dart';
 
 class HomeController {
-  HomeController({required this.voiceService}) {
+  HomeController() {
     // Initialize model and chat session
     _uuid = Uuid();
 
@@ -56,7 +56,7 @@ class HomeController {
   late final Uuid _uuid;
   late final ChatUser grokChatUser;
   GroqChat? _currentChatSession;
-  VoiceService voiceService;
+  // VoiceService voiceService;
   User? user;
 
   // Settings
@@ -78,7 +78,7 @@ class HomeController {
 
   bool get isTyping => _model.isTyping;
 
-  bool get isRecording => voiceService.isRecording;
+  // bool get isRecording => voiceService.isRecording;
 
   String? get currentSessionId => _model.currentSessionId;
 
@@ -90,11 +90,11 @@ class HomeController {
 
   String get selectedModel => _selectedModel;
 
-  set isRecording(bool value) {
-    voiceService.isRecording = value;
-    _model.setRecording(value);
-    setState(() {}); // automatically trigger rebuild if needed
-  }
+  // set isRecording(bool value) {
+  //   voiceService.isRecording = value;
+  //   _model.setRecording(value);
+  //   setState(() {}); // automatically trigger rebuild if needed
+  // }
 
   void initState(void Function(void Function()) setState) async {
     this.setState = setState;
@@ -250,41 +250,41 @@ class HomeController {
   }
 
   // == VOICE LOGIC ==
-  Future<void> toggleVoiceRecording(BuildContext context) async {
-    try {
-      if (!isRecording) {
-        isRecording = true;
-        setState(() {
-          _model.recordingStartTime = DateTime.now();
-        });
-        await voiceService.startListening();
-      } else {
-        await voiceService.stopListening();
-        isRecording = false;
-
-        final transcribedText = voiceService.wordsSpoken.trim();
-        if (transcribedText.isEmpty || voiceService.confidence < 0.4) {
-          throw 'Could not understand speech clearly.';
-        }
-
-        await getChatResponse(
-          message: ChatMessage(
-            user: currentUser,
-            createdAt: DateTime.now(),
-            text: transcribedText,
-          ),
-          setState: setState,
-        );
-      }
-    } catch (e) {
-      print('Speech error: $e');
-      isRecording = false;
-
-      if (!context.mounted) return;
-      print('error is =========================> ${e.toString()}');
-      showFailedSnackBar(context, title: e.toString());
-    }
-  }
+  // Future<void> toggleVoiceRecording(BuildContext context) async {
+  //   try {
+  //     if (!isRecording) {
+  //       isRecording = true;
+  //       setState(() {
+  //         _model.recordingStartTime = DateTime.now();
+  //       });
+  //       await voiceService.startListening();
+  //     } else {
+  //       await voiceService.stopListening();
+  //       isRecording = false;
+  //
+  //       final transcribedText = voiceService.wordsSpoken.trim();
+  //       if (transcribedText.isEmpty || voiceService.confidence < 0.4) {
+  //         throw 'Could not understand speech clearly.';
+  //       }
+  //
+  //       await getChatResponse(
+  //         message: ChatMessage(
+  //           user: currentUser,
+  //           createdAt: DateTime.now(),
+  //           text: transcribedText,
+  //         ),
+  //         setState: setState,
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print('Speech error: $e');
+  //     isRecording = false;
+  //
+  //     if (!context.mounted) return;
+  //     print('error is =========================> ${e.toString()}');
+  //     showFailedSnackBar(context, title: e.toString());
+  //   }
+  // }
 
   // == CHAT & HISTORY LOGIC ==
   Future<void> loadChatHistory() async {

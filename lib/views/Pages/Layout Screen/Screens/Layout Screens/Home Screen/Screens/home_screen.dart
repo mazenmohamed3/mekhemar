@@ -145,30 +145,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
         ),
         inputOptions: InputOptions(
-          inputDisabled: widget.homeController.isRecording,
           leading: [
             IconButton(
               onPressed:
-                  () => widget.homeController.toggleVoiceRecording(context),
+                  () {},
               icon: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    widget.homeController.isRecording ? Icons.stop : Icons.mic,
+                    Icons.mic,
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                  if (widget.homeController.isRecording)
-                    StreamBuilder(
-                      stream: Stream.periodic(Duration(seconds: 1)),
-                      builder: (context, snapshot) {
-                        final startTime =
-                            widget.homeController.recordingStartTime;
-                        if (startTime == null) return SizedBox.shrink();
-
-                        final duration = DateTime.now().difference(startTime);
-                        return CustomText(text: '${duration.inSeconds}s');
-                      },
-                    ),
                 ],
               ),
             ),
@@ -190,10 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
               horizontal: 16.w,
               vertical: 12.h,
             ),
-            hintText:
-                widget.homeController.isRecording
-                    ? 'recordMessage'.tr()
-                    : 'typeMessage'.tr(),
+            hintText: 'typeMessage'.tr(),
           ).applyDefaults(Theme.of(context).inputDecorationTheme),
         ),
       ),

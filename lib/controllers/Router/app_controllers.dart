@@ -17,7 +17,7 @@ import '../Pages/Splash/controllers/splash_controller.dart';
 class AppControllers {
   //Services
   static AuthService loginService = AuthService();
-  static VoiceService voiceService = VoiceService();
+  // static VoiceService voiceService = VoiceService();
   //Datasources
   static AuthDatasource authDatasource = AuthDatasource(loginService);
   //Controllers
@@ -32,7 +32,7 @@ class AppControllers {
   static ForgetPasswordController forgetPasswordController = ForgetPasswordController(authDatasource, loginService);
   static SignupController signupController = SignupController(authDatasource, loginService);
   static LayoutController layoutController = LayoutController();
-  static HomeController homeController = HomeController(voiceService: voiceService);
+  static HomeController homeController = HomeController();
   static ProfileController profileController = ProfileController(authDatasource: authDatasource, locationController: locationController, cloudinaryController: cloudinaryController);
   static SettingsController settingsController = SettingsController();
 }
