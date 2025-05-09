@@ -1,0 +1,5 @@
+/* App display name */
+CFBundleDisplayName = "Mekhemar";
+
+/* Fallback name for other uses (optional) */
+CFBundleName = "Mekhemar";
