@@ -54,7 +54,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     textAlign: TextAlign.center,
                     fontWeight: FontWeight.w700,
                     fontSize: 32.sp,
-                    overflow: TextOverflow.ellipsis,
                   );
                 },
               ),

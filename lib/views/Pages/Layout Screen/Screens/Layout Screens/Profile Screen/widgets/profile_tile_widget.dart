@@ -52,7 +52,6 @@ class ProfileTileWidget extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: titleColor ?? Theme.of(context).colorScheme.primary,
                   fontSize: 24.sp,
-                  overflow: TextOverflow.ellipsis, // Handle overflow
                 ),
                 if (subtitle != null)
                   CustomText(
@@ -60,7 +59,6 @@ class ProfileTileWidget extends StatelessWidget {
                     textDecoration: subtitleDecoration ?? TextDecoration.none,
                     fontWeight: FontWeight.w400,
                     fontSize: 16.sp,
-                    overflow: TextOverflow.clip, // Handle overflow
                   ),
               ],
             ),

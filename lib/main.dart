@@ -75,6 +75,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     widget.themeController.saveFirstTime(context);
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -89,7 +90,12 @@ class _MyAppState extends State<MyApp> {
       splitScreenMode: true,
       builder:
           (_, __) => AnnotatedRegion<SystemUiOverlayStyle>(
-            value: SystemUiOverlayStyle.dark,
+            value: SystemUiOverlayStyle(
+              systemNavigationBarColor: Colors.transparent,
+              statusBarColor: Colors.transparent,
+              systemStatusBarContrastEnforced: false,
+              systemNavigationBarContrastEnforced: false,
+            ),
             child: MyAppLifecycleController(
               child: MaterialApp.router(
                 title: 'Mekhemar',
