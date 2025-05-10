@@ -41,18 +41,18 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCIs3Ica5OIms0U5FKVwZvx_TXjV9Ok5YA',
-    appId: '1:865609841747:web:dc61fc662949e3e8fb1aa6',
-    messagingSenderId: '865609841747',
-    projectId: 'mekhemar-19f76',
-    authDomain: 'mekhemar-19f76.firebaseapp.com',
-    storageBucket: 'mekhemar-19f76.firebasestorage.app',
-    measurementId: 'G-XT68KR7Z0K',
+    apiKey: "AIzaSyCIs3Ica5OIms0U5FKVwZvx_TXjV9Ok5YA",
+    authDomain: "mekhemar-19f76.firebaseapp.com",
+    projectId: "mekhemar-19f76",
+    storageBucket: "mekhemar-19f76.firebasestorage.app",
+    messagingSenderId: "865609841747",
+    appId: "1:865609841747:web:23cddc1730f93ddbfb1aa6",
+    measurementId: "G-KFQNMS2H4E",
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCDYAnNl_hUWDyx7MwjW1HWSY1hrnbwMb8',
-    appId: '1:865609841747:android:fa60fdd9afcf9f8bfb1aa6',
+    appId: '1:865609841747:android:b160fe1988155c5bfb1aa6',
     messagingSenderId: '865609841747',
     projectId: 'mekhemar-19f76',
     storageBucket: 'mekhemar-19f76.firebasestorage.app',
@@ -60,31 +60,34 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDI-r52s7-F3hrROekC1JRoi08q35DO50E',
-    appId: '1:865609841747:ios:90a379bcfd31ff7bfb1aa6',
+    appId: '1:865609841747:ios:3a48bab3e40a422bfb1aa6',
     messagingSenderId: '865609841747',
     projectId: 'mekhemar-19f76',
     storageBucket: 'mekhemar-19f76.firebasestorage.app',
-    iosClientId: '865609841747-ekqs63be032a4j9mhkajlbqck5p15o6e.apps.googleusercontent.com',
-    iosBundleId: 'com.example.mobileProject',
+    androidClientId: '865609841747-8s8bj56n84vs37j1desfhb47obht7viv.apps.googleusercontent.com',
+    iosClientId: '865609841747-dmj9pcgf4jej4fegg2pg4j9ghmjte5kk.apps.googleusercontent.com',
+    iosBundleId: 'com.benhauniversity.mekhemar',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDI-r52s7-F3hrROekC1JRoi08q35DO50E',
-    appId: '1:865609841747:ios:90a379bcfd31ff7bfb1aa6',
+    appId: '1:865609841747:ios:3a48bab3e40a422bfb1aa6',
     messagingSenderId: '865609841747',
     projectId: 'mekhemar-19f76',
     storageBucket: 'mekhemar-19f76.firebasestorage.app',
-    iosClientId: '865609841747-ekqs63be032a4j9mhkajlbqck5p15o6e.apps.googleusercontent.com',
-    iosBundleId: 'com.example.mobileProject',
+    androidClientId: '865609841747-8s8bj56n84vs37j1desfhb47obht7viv.apps.googleusercontent.com',
+    iosClientId: '865609841747-dmj9pcgf4jej4fegg2pg4j9ghmjte5kk.apps.googleusercontent.com',
+    iosBundleId: 'com.benhauniversity.mekhemar',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyCIs3Ica5OIms0U5FKVwZvx_TXjV9Ok5YA',
-    appId: '1:865609841747:web:41a0b8033ff66ce9fb1aa6',
+    appId: '1:865609841747:web:29beae5a0fab0e28fb1aa6',
     messagingSenderId: '865609841747',
     projectId: 'mekhemar-19f76',
     authDomain: 'mekhemar-19f76.firebaseapp.com',
     storageBucket: 'mekhemar-19f76.firebasestorage.app',
-    measurementId: 'G-L68FFB3VEK',
+    measurementId: 'G-VXP4F31BKP',
   );
+
 }
